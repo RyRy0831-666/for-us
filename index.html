@@ -3243,6 +3243,7 @@
         const response = await fetch(CONFIG.WEBHOOK_URL, {
           method: CONFIG.WEBHOOK_METHOD || "POST",
           mode: isAppsScript ? "no-cors" : "cors",
+          keepalive: true,
           headers: isAppsScript
             ? { "Content-Type": "text/plain;charset=utf-8" }
             : { "Content-Type": "application/json", "Accept": "application/json" },
