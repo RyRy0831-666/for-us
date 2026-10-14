@@ -1,0 +1,3346 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#fff8f1" />
+  <title>和好吧｜專屬約會邀約</title>
+  <style>
+    /*
+      ╭──────────────────────────────────────────────────────────╮
+      │  和好吧：單檔版 SPA（真摯告白 + 和好約會邀請）             │
+      │  這個檔案不需任何套件，可直接用瀏覽器開啟。                │
+      │  音樂、照片、Webhook 與文案設定請在下方 JavaScript 的 CONFIG。 │
+      ╰──────────────────────────────────────────────────────────╯
+    */
+    :root {
+      --ink: #55362f;
+      --ink-soft: #89665f;
+      --pink-900: #a94261;
+      --pink-700: #d65f7f;
+      --pink-500: #f287a5;
+      --pink-300: #ffc6d4;
+      --pink-150: #ffe6ed;
+      --cream: #fff8f1;
+      --cream-deep: #f9eadc;
+      --butter: #fff0b8;
+      --coral: #ed795f;
+      --line: rgba(169, 66, 97, .14);
+      --danger: #d95063;
+      --shadow: 0 18px 46px rgba(142, 75, 82, .14), 0 3px 10px rgba(142, 75, 82, .08);
+      --shadow-soft: 0 10px 25px rgba(142, 75, 82, .10);
+      --ease-out: cubic-bezier(.23, 1, .32, 1);
+      --ease-in-out: cubic-bezier(.77, 0, .175, 1);
+    }
+
+    * { box-sizing: border-box; }
+    html { min-height: 100%; background: var(--cream); }
+    body {
+      min-width: 320px;
+      min-height: 100vh;
+      margin: 0;
+      color: var(--ink);
+      background:
+        radial-gradient(ellipse at 80% 15%, rgba(255, 230, 205, 0.6) 0%, transparent 45%),
+        radial-gradient(ellipse at 15% 85%, rgba(255, 215, 225, 0.55) 0%, transparent 45%),
+        linear-gradient(168deg, #faf5eb 0%, #f7efe4 50%, #fdf2f4 100%);
+      font-family: ui-rounded, "PingFang TC", "Noto Sans TC", "Microsoft JhengHei", system-ui, -apple-system, sans-serif;
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+      transition: background 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    /* 關卡隨步切換全域柔和漸層背景 */
+    body[data-step="0"] {
+      background:
+        radial-gradient(ellipse at 80% 15%, rgba(255, 230, 205, 0.6) 0%, transparent 45%),
+        radial-gradient(ellipse at 15% 85%, rgba(255, 215, 225, 0.55) 0%, transparent 45%),
+        linear-gradient(168deg, #faf5eb 0%, #f7efe4 50%, #fdf2f4 100%);
+    }
+    body[data-step="1"] {
+      background:
+        radial-gradient(ellipse at 15% 15%, rgba(255, 215, 225, 0.6) 0%, transparent 45%),
+        radial-gradient(ellipse at 85% 85%, rgba(255, 235, 205, 0.55) 0%, transparent 45%),
+        linear-gradient(168deg, #fdf4f4 0%, #faedf0 50%, #fcf7ee 100%);
+    }
+    body[data-step="2"] {
+      background:
+        radial-gradient(ellipse at 85% 12%, rgba(255, 218, 226, 0.55) 0%, transparent 42%),
+        radial-gradient(ellipse at 12% 88%, rgba(206, 230, 220, 0.55) 0%, transparent 45%),
+        linear-gradient(172deg, #f7f3ec 0%, #edf5f0 48%, #faecef 100%);
+    }
+    body[data-step="3"] {
+      background:
+        radial-gradient(ellipse at 80% 15%, rgba(225, 205, 255, 0.5) 0%, transparent 40%),
+        radial-gradient(ellipse at 15% 80%, rgba(255, 215, 195, 0.5) 0%, transparent 42%),
+        linear-gradient(160deg, #fbf4fa 0%, #f1ecf9 48%, #fff0e8 100%);
+    }
+    body[data-step="4"] {
+      background:
+        radial-gradient(ellipse at 15% 18%, rgba(255, 232, 180, 0.52) 0%, transparent 38%),
+        radial-gradient(ellipse at 85% 85%, rgba(255, 212, 220, 0.52) 0%, transparent 42%),
+        linear-gradient(165deg, #fdf8f0 0%, #fef4ed 50%, #fbf0f3 100%);
+    }
+    body[data-step="5"] {
+      background:
+        radial-gradient(ellipse at 15% 20%, rgba(255, 205, 225, 0.48) 0%, transparent 38%),
+        radial-gradient(ellipse at 85% 25%, rgba(195, 238, 248, 0.45) 0%, transparent 38%),
+        radial-gradient(ellipse at 50% 88%, rgba(255, 238, 185, 0.48) 0%, transparent 42%),
+        linear-gradient(165deg, #fff5f8 0%, #f3f8fe 50%, #fffbf2 100%);
+    }
+    body[data-step="6"] {
+      background:
+        radial-gradient(ellipse at 12% 16%, rgba(255, 228, 200, 0.52) 0%, transparent 38%),
+        radial-gradient(ellipse at 88% 82%, rgba(235, 220, 248, 0.48) 0%, transparent 42%),
+        linear-gradient(155deg, #fcf6f1 0%, #f8f1ea 50%, #f7eff9 100%);
+    }
+    body[data-step="7"] {
+      background:
+        radial-gradient(ellipse at 80% 20%, rgba(225, 210, 255, 0.55) 0%, transparent 45%),
+        radial-gradient(ellipse at 15% 85%, rgba(255, 215, 230, 0.55) 0%, transparent 45%),
+        linear-gradient(165deg, #faf5fa 0%, #f4eef8 50%, #fdf5f2 100%);
+    }
+    body[data-step="8"] {
+      background: radial-gradient(ellipse at 50% 30%, #171426 0%, #0d0b14 60%, #050508 100%) !important;
+      overflow: hidden !important;
+    }
+
+    button, input, textarea, select { font: inherit; }
+    button { -webkit-tap-highlight-color: transparent; }
+    button:not(:disabled), a, label, input, textarea, select { -webkit-tap-highlight-color: transparent; }
+    ::selection { background: var(--pink-300); color: var(--ink); }
+
+    .app-shell {
+      position: relative;
+      isolation: isolate;
+      width: min(100%, 620px);
+      min-height: 100dvh;
+      margin: 0 auto;
+      padding: max(16px, env(safe-area-inset-top)) 16px max(22px, env(safe-area-inset-bottom));
+      overflow: hidden;
+    }
+    .app-shell::before {
+      content: "";
+      position: fixed;
+      z-index: -2;
+      inset: 0;
+      margin: auto;
+      width: min(100vw, 620px);
+      background-image: radial-gradient(rgba(190, 112, 118, .12) .7px, transparent .7px);
+      background-size: 12px 12px;
+      opacity: .33;
+      pointer-events: none;
+    }
+    .blob {
+      position: fixed;
+      z-index: -1;
+      border-radius: 999px;
+      filter: blur(1px);
+      pointer-events: none;
+      transition: background 0.8s ease;
+    }
+    .blob.one { width: 145px; height: 145px; background: rgba(255, 207, 215, .57); left: -68px; top: 34%; }
+    .blob.two { width: 92px; height: 92px; background: rgba(255, 226, 164, .45); right: -32px; top: 10%; }
+    .blob.three { width: 130px; height: 130px; background: rgba(255, 199, 184, .36); right: -56px; bottom: 7%; }
+
+    body[data-step="0"] .blob.one { background: rgba(255, 225, 195, 0.55); }
+    body[data-step="0"] .blob.two { background: rgba(255, 210, 225, 0.55); }
+    body[data-step="0"] .blob.three { background: rgba(255, 235, 190, 0.45); }
+
+    body[data-step="1"] .blob.one { background: rgba(255, 215, 225, 0.55); }
+    body[data-step="1"] .blob.two { background: rgba(255, 230, 205, 0.55); }
+    body[data-step="1"] .blob.three { background: rgba(255, 205, 220, 0.45); }
+
+    body[data-step="2"] .blob.one { background: rgba(210, 235, 220, 0.55); }
+    body[data-step="2"] .blob.two { background: rgba(255, 220, 228, 0.55); }
+    body[data-step="2"] .blob.three { background: rgba(185, 215, 200, 0.45); }
+
+    body[data-step="3"] .blob.one { background: rgba(225, 205, 255, 0.5); }
+    body[data-step="3"] .blob.two { background: rgba(255, 220, 200, 0.45); }
+    body[data-step="3"] .blob.three { background: rgba(200, 185, 245, 0.4); }
+
+    body[data-step="4"] .blob.one { background: rgba(255, 230, 185, 0.55); }
+    body[data-step="4"] .blob.two { background: rgba(255, 210, 220, 0.5); }
+    body[data-step="4"] .blob.three { background: rgba(250, 220, 170, 0.45); }
+
+    body[data-step="5"] .blob.one { background: rgba(255, 200, 225, 0.5); }
+    body[data-step="5"] .blob.two { background: rgba(185, 235, 248, 0.45); }
+    body[data-step="5"] .blob.three { background: rgba(255, 235, 175, 0.5); }
+
+    body[data-step="6"] .blob.one { background: rgba(255, 225, 195, 0.5); }
+    body[data-step="6"] .blob.two { background: rgba(235, 215, 245, 0.45); }
+    body[data-step="6"] .blob.three { background: rgba(250, 210, 185, 0.4); }
+
+    body[data-step="7"] .blob.one { background: rgba(225, 210, 255, 0.5); }
+    body[data-step="7"] .blob.two { background: rgba(255, 220, 235, 0.5); }
+    body[data-step="7"] .blob.three { background: rgba(240, 205, 250, 0.45); }
+
+    body[data-step="8"] .blob.one { background: rgba(255, 190, 215, 0.6); }
+    body[data-step="8"] .blob.two { background: rgba(255, 230, 165, 0.55); }
+    body[data-step="8"] .blob.three { background: rgba(255, 175, 200, 0.5); }
+
+    /* Header / progress / music */
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      min-height: 51px;
+      padding: 8px 3px 14px;
+    }
+    .brand { display: flex; align-items: center; gap: 10px; }
+    .stamp {
+      display: grid;
+      place-items: center;
+      width: 38px;
+      height: 38px;
+      color: #fff7f5;
+      font-size: 19px;
+      background: linear-gradient(145deg, var(--pink-500), var(--pink-900));
+      border: 2px solid rgba(255,255,255,.76);
+      border-radius: 14px 17px 13px 17px;
+      box-shadow: 0 4px 0 #eab0bd, 0 7px 14px rgba(169,66,97,.17);
+      transform: rotate(-4deg);
+    }
+    .brand-copy { line-height: 1.1; }
+    .brand-copy strong { display: block; letter-spacing: .08em; font-size: 13px; }
+    .brand-copy span { display: block; margin-top: 3px; color: var(--ink-soft); font-size: 10px; letter-spacing: .08em; }
+    
+    .topbar-right { display: flex; align-items: center; gap: 10px; }
+    
+    /* 常駐唱片背景音樂按鈕 */
+    .music-toggle {
+      display: grid;
+      place-items: center;
+      width: 36px;
+      height: 36px;
+      background: #ffffff;
+      border: 1.5px solid rgba(214, 95, 127, 0.3);
+      border-radius: 50%;
+      box-shadow: 0 3px 8px rgba(169, 66, 97, 0.12);
+      cursor: pointer;
+      font-size: 16px;
+      line-height: 1;
+      padding: 0;
+      transition: transform .2s ease, box-shadow .2s ease, opacity .2s ease;
+      user-select: none;
+    }
+    .music-toggle:hover { transform: scale(1.08); box-shadow: 0 5px 12px rgba(169, 66, 97, 0.18); }
+    .music-toggle.playing .disc-icon { display: inline-block; animation: spinDisc 3.5s linear infinite; }
+    .music-toggle.paused { opacity: 0.6; filter: grayscale(0.5); }
+    @keyframes spinDisc { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+
+    .progress-wrap { display: flex; align-items: center; gap: 8px; }
+    .progress-dots { display: flex; gap: 4px; }
+    .progress-dots i {
+      display: block;
+      width: 6.5px;
+      height: 6.5px;
+      background: #e7c8c1;
+      border-radius: 50%;
+      transition: transform .24s var(--ease-out), background .24s var(--ease-out);
+    }
+    .progress-dots i.done { background: var(--pink-700); transform: scale(1.18); }
+    .progress-text { min-width: 42px; color: var(--ink-soft); font-size: 11px; font-weight: 700; text-align: right; letter-spacing: .02em; }
+
+    /* Card, typography and shared controls */
+    .paper-card {
+      position: relative;
+      min-height: calc(100dvh - 93px);
+      padding: clamp(27px, 7vw, 42px) clamp(20px, 6vw, 38px) 29px;
+      background: rgba(255, 253, 249, .87);
+      border: 1px solid rgba(255,255,255,.95);
+      border-radius: 31px 31px 25px 25px;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+    .paper-card::after {
+      content: "";
+      position: absolute;
+      z-index: -1;
+      inset: 9px;
+      border: 1px solid rgba(220, 141, 157, .15);
+      border-radius: 24px 24px 18px 18px;
+      pointer-events: none;
+    }
+    .paper-card::before {
+      content: "";
+      position: absolute;
+      z-index: -1;
+      top: -52px;
+      right: -57px;
+      width: 148px;
+      height: 148px;
+      background: radial-gradient(circle, rgba(255, 205, 215, .52), rgba(255,205,215,0) 68%);
+      border-radius: 50%;
+    }
+
+    /* ==========================================================
+       各關卡專屬卡片風格設計 (Step 0 ~ Step 8)
+       ========================================================== */
+
+    /* Step 0: 心聲第一章 · 備禮的用心 */
+    #step0 .paper-card {
+      background: linear-gradient(175deg, rgba(255, 253, 248, 0.96) 0%, rgba(255, 249, 240, 0.94) 50%, rgba(254, 245, 247, 0.96) 100%);
+      border-color: rgba(235, 215, 195, 0.9);
+      box-shadow: 0 18px 46px rgba(150, 115, 95, 0.12), 0 3px 10px rgba(150, 115, 95, 0.08);
+    }
+    #step0 .paper-card::after {
+      border: 1px dashed rgba(220, 175, 145, 0.35);
+    }
+
+    /* Step 1: 心聲第二章 · 堅定與陪伴 */
+    #step1 .paper-card {
+      background: linear-gradient(172deg, rgba(255, 252, 252, 0.96) 0%, rgba(255, 246, 248, 0.94) 50%, rgba(255, 250, 243, 0.96) 100%);
+      border-color: rgba(240, 210, 218, 0.9);
+      box-shadow: 0 18px 46px rgba(160, 100, 115, 0.12), 0 3px 10px rgba(160, 100, 115, 0.08);
+    }
+    #step1 .paper-card::after {
+      border-color: rgba(230, 160, 180, 0.25);
+    }
+
+    /* 心聲長信排版樣式 */
+    .letter-stage {
+      position: relative;
+      margin: 14px 0 24px;
+      padding: 22px 18px;
+      background: rgba(255, 255, 255, 0.88);
+      border: 1px solid rgba(225, 195, 185, 0.4);
+      border-radius: 20px;
+      box-shadow: 0 6px 20px rgba(150, 80, 95, 0.06);
+      text-align: left;
+    }
+    .letter-stage::before {
+      content: "“";
+      position: absolute;
+      top: -8px;
+      left: 14px;
+      font-size: 56px;
+      color: var(--pink-300);
+      font-family: Georgia, serif;
+      line-height: 1;
+      pointer-events: none;
+      opacity: 0.55;
+    }
+    .letter-stage p {
+      margin: 0;
+      color: #4e352e;
+      font-size: 14.5px;
+      line-height: 2.05;
+      letter-spacing: 0.035em;
+      text-align: justify;
+      font-weight: 520;
+    }
+    .letter-glow {
+      position: absolute;
+      top: 8%;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 250px;
+      height: 250px;
+      background: radial-gradient(circle, rgba(255, 220, 195, 0.45) 0%, rgba(255, 205, 220, 0.25) 50%, transparent 75%);
+      border-radius: 50%;
+      pointer-events: none;
+      user-select: none;
+      z-index: 0;
+      animation: pulseLetter 3.8s ease-in-out infinite alternate;
+    }
+    @keyframes pulseLetter {
+      from { transform: translateX(-50%) scale(0.92); opacity: 0.55; }
+      to { transform: translateX(-50%) scale(1.1); opacity: 0.95; }
+    }
+
+    /* Step 2: 破冰提問 · 古風水墨詩意（山有木兮木有枝，心悦君兮君不知） */
+    #step2 .paper-card {
+      background: linear-gradient(180deg, rgba(255, 253, 249, 0.95) 0%, rgba(247, 252, 249, 0.93) 48%, rgba(255, 248, 250, 0.95) 100%);
+      border-color: rgba(205, 226, 216, 0.85);
+      box-shadow: 0 18px 46px rgba(118, 142, 130, 0.13), 0 3px 10px rgba(118, 142, 130, 0.08);
+    }
+    #step2 .paper-card::after {
+      border-color: rgba(142, 180, 165, 0.22);
+    }
+    .poetic-subheading {
+      font-family: "Songti TC", "Noto Serif TC", "BiauKai", "DFKai-SB", serif;
+      font-size: 16px !important;
+      font-weight: 600 !important;
+      letter-spacing: 0.12em !important;
+      color: #684942 !important;
+      line-height: 1.85 !important;
+    }
+    .traditional-seal {
+      position: absolute;
+      top: 24px;
+      right: 22px;
+      width: 32px;
+      height: 48px;
+      border: 2px solid #b83b32;
+      border-radius: 4px;
+      color: #b83b32;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      font-family: "Songti TC", "Noto Serif TC", "BiauKai", "DFKai-SB", serif;
+      font-size: 13px;
+      font-weight: 900;
+      line-height: 1.15;
+      letter-spacing: 1px;
+      padding: 3px 0;
+      opacity: 0.88;
+      pointer-events: none;
+      user-select: none;
+      background: rgba(255, 245, 242, 0.7);
+      box-shadow: inset 0 0 5px rgba(184, 59, 50, 0.2), 0 2px 6px rgba(184, 59, 50, 0.12);
+      transform: rotate(2.5deg);
+      z-index: 1;
+    }
+    .bg-branch {
+      position: absolute;
+      top: -5px;
+      right: -10px;
+      width: 170px;
+      height: 140px;
+      pointer-events: none;
+      user-select: none;
+      z-index: 0;
+      opacity: 0.85;
+    }
+    .bg-mountains {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      width: 100%;
+      height: 95px;
+      pointer-events: none;
+      user-select: none;
+      z-index: 0;
+      opacity: 0.75;
+    }
+    .petals-layer {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      overflow: hidden;
+      z-index: 0;
+    }
+    .petal {
+      position: absolute;
+      background: radial-gradient(ellipse at 35% 35%, rgba(255, 210, 222, 0.85), rgba(248, 165, 185, 0.45));
+      border-radius: 60% 40% 70% 30% / 50% 60% 40% 50%;
+      filter: drop-shadow(0 2px 2px rgba(220, 130, 150, 0.2));
+      animation: driftDown linear infinite;
+    }
+    .petal-1 { width: 14px; height: 11px; left: 12%; top: -15px; animation-duration: 9s; animation-delay: 0s; }
+    .petal-2 { width: 18px; height: 13px; left: 45%; top: -20px; animation-duration: 12s; animation-delay: 3s; }
+    .petal-3 { width: 12px; height: 9px; left: 78%; top: -15px; animation-duration: 8.5s; animation-delay: 5s; }
+    .petal-4 { width: 15px; height: 12px; left: 30%; top: -18px; animation-duration: 10.5s; animation-delay: 7s; }
+    @keyframes driftDown {
+      0% { transform: translate3d(0, 0, 0) rotate(0deg); opacity: 0; }
+      12% { opacity: 0.85; }
+      85% { opacity: 0.85; }
+      100% { transform: translate3d(55px, 500px, 0) rotate(340deg); opacity: 0; }
+    }
+
+    /* Step Proposal: 11/1 見面約定 · 楓葉暖秋與重逢之約 */
+    #stepProposal .paper-card {
+      background: linear-gradient(172deg, rgba(255, 253, 248, 0.97) 0%, rgba(255, 248, 242, 0.95) 50%, rgba(255, 242, 244, 0.97) 100%);
+      border-color: rgba(242, 218, 202, 0.92);
+      box-shadow: 0 18px 46px rgba(165, 120, 100, 0.12), 0 3px 10px rgba(165, 120, 100, 0.08);
+      position: relative;
+    }
+    #stepProposal .paper-card::after {
+      border: 1px dashed rgba(228, 175, 150, 0.35);
+    }
+    .maple-stamp {
+      position: absolute;
+      top: 22px;
+      right: 22px;
+      padding: 3px 8px;
+      border: 1.5px dashed #d87d60;
+      border-radius: 6px;
+      color: #b95d3e;
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      background: rgba(255, 246, 240, 0.85);
+      pointer-events: none;
+      user-select: none;
+      transform: rotate(2deg);
+      z-index: 1;
+    }
+    .proposal-story {
+      position: relative;
+      margin: 14px 0 16px;
+      padding: 18px 16px;
+      background: rgba(255, 255, 255, 0.88);
+      border: 1px solid rgba(230, 200, 185, 0.45);
+      border-radius: 18px;
+      box-shadow: 0 4px 16px rgba(160, 100, 80, 0.06);
+      text-align: left;
+    }
+    .proposal-story-quote {
+      position: absolute;
+      top: -8px;
+      left: 14px;
+      font-size: 48px;
+      color: #e59074;
+      font-family: Georgia, serif;
+      line-height: 1;
+      opacity: 0.45;
+      pointer-events: none;
+    }
+    .proposal-story p {
+      margin: 0;
+      color: #4e352e;
+      font-size: 14.5px;
+      line-height: 1.95;
+      letter-spacing: 0.03em;
+      text-align: justify;
+      font-weight: 520;
+    }
+    .proposal-plan-card {
+      margin: 14px 0 20px;
+      padding: 14px 16px;
+      background: linear-gradient(145deg, #fffaf4, #fff3ea);
+      border: 1.5px solid #f2d1be;
+      border-radius: 18px;
+      box-shadow: 0 4px 14px rgba(185, 110, 80, 0.08);
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      text-align: left;
+    }
+    .plan-card-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .plan-card-icon {
+      font-size: 20px;
+      width: 28px;
+      text-align: center;
+      flex-shrink: 0;
+    }
+    .plan-card-info {
+      display: flex;
+      flex-direction: column;
+    }
+    .plan-card-label {
+      font-size: 11px;
+      color: #9d6855;
+      font-weight: 700;
+    }
+    .plan-card-val {
+      font-size: 14px;
+      color: #3f2822;
+      font-weight: 800;
+      letter-spacing: 0.02em;
+    }
+    .plan-card-row-time {
+      align-items: flex-start !important;
+    }
+    .plan-card-row-time .plan-card-icon {
+      margin-top: 4px;
+    }
+    .proposal-time-wrap {
+      margin-top: 5px;
+      background: #ffffff !important;
+      border: 1.5px solid #ecd0c0 !important;
+      border-radius: 13px !important;
+      box-shadow: 0 3px 0 rgba(236, 208, 192, 0.6) !important;
+      transition: border-color .18s var(--ease-out), box-shadow .18s var(--ease-out);
+    }
+    .proposal-time-wrap:focus-within {
+      border-color: #d84b5c !important;
+      box-shadow: 0 3px 0 rgba(216, 75, 92, 0.25), 0 0 0 3px rgba(216, 75, 92, 0.12) !important;
+    }
+    .proposal-time-wrap input {
+      min-height: 42px !important;
+      font-size: 15px !important;
+      font-weight: 800 !important;
+      color: #3f2822 !important;
+      padding: 7px 12px !important;
+    }
+    .proposal-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-top: 4px;
+    }
+    .proposal-yes-btn {
+      font-size: 15.5px !important;
+      background: linear-gradient(135deg, #f07f6f, #d84b5c) !important;
+      box-shadow: 0 6px 0 #b33948, 0 12px 20px rgba(181, 63, 98, 0.22) !important;
+    }
+    .proposal-yes-btn:hover {
+      box-shadow: 0 8px 0 #b33948, 0 15px 22px rgba(181, 63, 98, 0.22) !important;
+    }
+    .proposal-no-btn {
+      font-size: 14px !important;
+      min-height: 48px !important;
+      opacity: 0.95;
+    }
+    .text-link-btn {
+      background: transparent;
+      border: 0;
+      color: #9d6855;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      padding: 6px 10px;
+      margin-top: 10px;
+      text-decoration: underline;
+      text-underline-offset: 3px;
+      transition: color 0.16s ease;
+      display: inline-block;
+    }
+    .text-link-btn:hover {
+      color: var(--pink-900);
+    }
+
+    /* Step 3: 約會時間挑選 · 暮色星軌 */
+    #step3 .paper-card {
+      background: linear-gradient(175deg, rgba(255, 253, 255, 0.95) 0%, rgba(246, 242, 253, 0.93) 50%, rgba(255, 245, 238, 0.95) 100%);
+      border-color: rgba(226, 212, 246, 0.85);
+      box-shadow: 0 18px 46px rgba(125, 100, 150, 0.12), 0 3px 10px rgba(125, 100, 150, 0.08);
+    }
+    #step3 .paper-card::after {
+      border-color: rgba(185, 160, 225, 0.22);
+    }
+    .bg-stars {
+      position: absolute;
+      top: 10px;
+      right: 12px;
+      width: 140px;
+      height: 105px;
+      pointer-events: none;
+      user-select: none;
+      z-index: 0;
+    }
+    .twinkle-slow { animation: starPulse 2.8s ease-in-out infinite alternate; }
+    .twinkle-fast { animation: starPulse 1.8s ease-in-out infinite alternate; }
+    @keyframes starPulse {
+      from { opacity: 0.35; transform: scale(0.85); }
+      to { opacity: 0.95; transform: scale(1.15); }
+    }
+
+    /* Step 4: 約會守則 · 誓約羊皮信箋 */
+    #step4 .paper-card {
+      background: linear-gradient(170deg, rgba(255, 253, 247, 0.96) 0%, rgba(255, 249, 240, 0.94) 50%, rgba(254, 244, 246, 0.96) 100%);
+      border-color: rgba(240, 222, 195, 0.9);
+      box-shadow: 0 18px 46px rgba(160, 130, 95, 0.12), 0 3px 10px rgba(160, 130, 95, 0.08);
+    }
+    #step4 .paper-card::after {
+      border: 1px dashed rgba(215, 175, 130, 0.32);
+    }
+    .scroll-stamp {
+      position: absolute;
+      top: 22px;
+      right: 22px;
+      padding: 3px 8px;
+      border: 1.5px dashed #c99868;
+      border-radius: 6px;
+      color: #b37e4c;
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      background: rgba(255, 248, 235, 0.75);
+      pointer-events: none;
+      user-select: none;
+      transform: rotate(-3deg);
+      z-index: 1;
+    }
+
+    /* Step 5: 心願清單 · 糖果遊樂園 */
+    #step5 .paper-card {
+      background: linear-gradient(165deg, rgba(255, 252, 254, 0.96) 0%, rgba(245, 250, 255, 0.93) 50%, rgba(255, 251, 243, 0.96) 100%);
+      border-color: rgba(235, 218, 240, 0.88);
+      box-shadow: 0 18px 46px rgba(150, 110, 150, 0.12), 0 3px 10px rgba(150, 110, 150, 0.08);
+    }
+    #step5 .paper-card::after {
+      border-color: rgba(210, 170, 220, 0.22);
+    }
+    .bg-carnival {
+      position: absolute;
+      top: 8px;
+      right: 10px;
+      width: 150px;
+      height: 98px;
+      pointer-events: none;
+      user-select: none;
+      z-index: 0;
+    }
+
+    /* Step 6: 細節確定 · 溫馨手帳工作台 */
+    #step6 .paper-card {
+      background: linear-gradient(160deg, rgba(255, 253, 249, 0.96) 0%, rgba(252, 248, 242, 0.94) 50%, rgba(250, 243, 248, 0.95) 100%);
+      border-color: rgba(235, 218, 205, 0.88);
+      box-shadow: 0 18px 46px rgba(140, 115, 95, 0.12), 0 3px 10px rgba(140, 115, 95, 0.08);
+    }
+    #step6 .paper-card::after {
+      border-color: rgba(200, 165, 140, 0.22);
+    }
+    .washi-tape {
+      position: absolute;
+      top: -7px;
+      left: 50%;
+      transform: translateX(-50%) rotate(-1.5deg);
+      width: 105px;
+      height: 22px;
+      background: linear-gradient(90deg, rgba(255, 210, 180, 0.72), rgba(255, 228, 200, 0.72));
+      border-left: 2px dashed rgba(255, 255, 255, 0.85);
+      border-right: 2px dashed rgba(255, 255, 255, 0.85);
+      box-shadow: 0 2px 4px rgba(160, 120, 100, 0.12);
+      pointer-events: none;
+      user-select: none;
+      z-index: 2;
+    }
+
+    /* Step 7: 最後你想跟我說什麼 (密語輸入關卡) */
+    #step7 .paper-card {
+      background: linear-gradient(168deg, rgba(255, 252, 254, 0.96) 0%, rgba(248, 245, 255, 0.94) 50%, rgba(255, 248, 243, 0.96) 100%);
+      border-color: rgba(230, 215, 242, 0.9);
+      box-shadow: 0 18px 46px rgba(135, 105, 150, 0.12), 0 3px 10px rgba(135, 105, 150, 0.08);
+    }
+    #step7 .paper-card::after {
+      border-color: rgba(200, 160, 220, 0.25);
+    }
+    .secret-box {
+      margin: 24px 0 16px;
+    }
+    .secret-wrap {
+      margin-bottom: 14px;
+    }
+
+    /* ════════════════════════════════════════════════════════════════
+       💖 Step 8 終極大結局：黑夜星空 · 彩色便籤愛心與散落動畫
+       ════════════════════════════════════════════════════════════════ */
+    body[data-step="8"] .app-shell {
+      width: 100vw;
+      max-width: 100vw;
+      padding: 0;
+      height: 100dvh;
+      overflow: hidden;
+    }
+    body[data-step="8"] .topbar {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 30;
+      background: transparent;
+      padding: max(12px, env(safe-area-inset-top)) 16px 0;
+    }
+    body[data-step="8"] .topbar .brand,
+    body[data-step="8"] .topbar .progress-wrap {
+      opacity: 0;
+      pointer-events: none;
+    }
+    body[data-step="8"] .topbar .music-toggle {
+      background: rgba(255, 255, 255, 0.14);
+      border-color: rgba(255, 255, 255, 0.28);
+      color: #fff;
+    }
+    body[data-step="8"] .blob,
+    body[data-step="8"] .app-shell::before {
+      display: none !important;
+    }
+
+    #step8 {
+      position: fixed;
+      inset: 0;
+      width: 100vw;
+      height: 100dvh;
+      overflow: hidden;
+      z-index: 10;
+    }
+    #step8 .paper-card {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      min-height: 100dvh;
+      border: none;
+      background: transparent;
+      box-shadow: none;
+      padding: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+    #step8 .paper-card::after {
+      display: none;
+    }
+
+    /* ════════════════════════════════════════════════════════════════
+       💌 Step 8 Tkinter 風格彈窗大結局 (愛心輪廓 ➔ 直接消失 ➔ 滿版風暴)
+       ════════════════════════════════════════════════════════════════ */
+    .popup-stage {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      overflow: hidden;
+      z-index: 10;
+    }
+
+    /* 愛心正中央：「我也喜歡你」核心文字 (往上微調，在最上層徹底不被卡片遮擋) */
+    .center-hero {
+      position: absolute;
+      top: calc(50% - 44px);
+      left: 50%;
+      transform: translate(-50%, -50%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      z-index: 30;
+      pointer-events: none;
+      transition: opacity 0.4s ease, transform 0.4s ease;
+      animation: heroIn 1.5s ease-out forwards;
+    }
+    .center-hero.hidden {
+      opacity: 0 !important;
+      transform: translate(-50%, -50%) scale(0.6) !important;
+      pointer-events: none !important;
+    }
+    .center-hero-heart {
+      font-size: clamp(34px, 7.5vw, 44px);
+      line-height: 1;
+      margin-bottom: 6px;
+      filter: drop-shadow(0 0 16px rgba(255, 105, 180, 0.9));
+      animation: heartPulse 1.4s ease-in-out infinite alternate;
+    }
+    .center-hero-text {
+      font-size: clamp(28px, 6.8vw, 46px) !important;
+      font-weight: 900 !important;
+      letter-spacing: 0.12em !important;
+      background: linear-gradient(135deg, #fff5f7 0%, #ffc5d3 45%, #ffaec3 100%) !important;
+      -webkit-background-clip: text !important;
+      -webkit-text-fill-color: transparent !important;
+      filter: drop-shadow(0 0 20px rgba(220, 75, 115, 0.85)) drop-shadow(0 0 40px rgba(180, 50, 90, 0.5));
+      margin: 0 !important;
+      padding: 0 10px;
+      white-space: nowrap;
+    }
+    @media (max-width: 600px) {
+      .center-hero {
+        top: calc(50% - 36px);
+      }
+    }
+    @keyframes heroIn {
+      0% { opacity: 0; transform: translate(-50%, -50%) scale(0.65); }
+      60% { opacity: 1; transform: translate(-50%, -50%) scale(1.08); }
+      100% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+    }
+    @keyframes heartPulse {
+      from { transform: scale(1); filter: drop-shadow(0 0 12px rgba(255, 105, 180, 0.7)); }
+      to { transform: scale(1.15); filter: drop-shadow(0 0 24px rgba(255, 105, 180, 1)); }
+    }
+
+    /* Tkinter / Windows 風格小視窗卡片（彈跳出彈窗效果） */
+    .tk-win {
+      position: absolute;
+      width: 102px;
+      height: 40px;
+      background: #ffffff;
+      border-radius: 5px;
+      overflow: hidden;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.62), 0 2px 5px rgba(0, 0, 0, 0.35);
+      border: 1px solid rgba(255, 255, 255, 0.35);
+      display: flex;
+      flex-direction: column;
+      transform-origin: center center;
+      will-change: transform, opacity;
+      z-index: 20;
+      animation: tkPopIn 0.30s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+    }
+    @media (min-width: 600px) {
+      .tk-win {
+        width: 116px;
+        height: 44px;
+      }
+    }
+
+    /* 活潑回彈、彈出來的物理彈簧動畫效果 */
+    @keyframes tkPopIn {
+      0% {
+        opacity: 0;
+        transform: scale(0.15) translate3d(0, 32px, 0) rotate(-5deg);
+      }
+      55% {
+        opacity: 1;
+        transform: scale(1.16) translate3d(0, -6px, 0) rotate(2.5deg);
+      }
+      78% {
+        transform: scale(0.94) translate3d(0, 2px, 0) rotate(-1deg);
+      }
+      100% {
+        opacity: 1;
+        transform: scale(1) translate3d(0, 0, 0) rotate(0deg);
+      }
+    }
+
+    /* 頂部標題列 (Windows 視窗抬頭) */
+    .tk-titlebar {
+      height: 16px;
+      background: #ebebeb;
+      border-bottom: 1px solid #d4d4d4;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 5px;
+      font-size: 8px;
+      color: #555555;
+      user-select: none;
+      flex-shrink: 0;
+    }
+    .tk-title-left {
+      display: flex;
+      align-items: center;
+      gap: 3px;
+    }
+    .tk-icon {
+      width: 8px;
+      height: 8px;
+      background: #4285f4;
+      border-radius: 2px;
+      display: inline-block;
+    }
+    .tk-title-btns {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      font-family: monospace;
+      font-size: 8px;
+      color: #666666;
+    }
+    .tk-btn-close {
+      color: #999999;
+    }
+
+    /* 內容主體 (馬卡龍色彩區) */
+    .tk-body {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2px 4px;
+      font-size: 11px;
+      font-weight: 750;
+      color: #1a1a1a;
+      letter-spacing: 0.02em;
+      white-space: nowrap;
+      text-align: center;
+    }
+    @media (min-width: 600px) {
+      .tk-body {
+        font-size: 12px;
+      }
+    }
+
+    /* 繽紛馬卡龍底色 (比照 Tkinter 經典配色) */
+    .bg-pink   { background-color: #ff9bbb; }
+    .bg-blue   { background-color: #9cd5ff; }
+    .bg-green  { background-color: #9fe29d; }
+    .bg-yellow { background-color: #fff185; }
+    .bg-purple { background-color: #e5b3f8; }
+    .bg-cyan   { background-color: #8de8f2; }
+    .bg-rose   { background-color: #ff6e99; color: #ffffff; }
+
+    /* ════════════════════════════════════════════════════════════════
+       💌 浪漫手折紙飛機全螢幕動畫層：信折成紙飛機 ➔ 流暢往右起飛
+       ════════════════════════════════════════════════════════════════ */
+    .plane-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 99;
+      display: none;
+      place-items: center;
+      background: rgba(255, 248, 241, 0.94);
+      backdrop-filter: blur(8px);
+      overflow: hidden;
+      pointer-events: none;
+    }
+    .plane-overlay.launching {
+      display: grid;
+      animation: fadeIn .25s ease-out forwards;
+    }
+
+    .origami-sky {
+      position: relative;
+      width: min(92vw, 440px);
+      height: 360px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+    .flight-stage {
+      position: relative;
+      width: 220px;
+      height: 160px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* 飛行載體主容器 (沿著航線流暢向右飛行) */
+    .origami-actor {
+      position: relative;
+      width: 140px;
+      height: 100px;
+      transform-style: preserve-3d;
+      will-change: transform;
+    }
+    .plane-overlay.launching .origami-actor {
+      animation: flightPath 4.6s cubic-bezier(0.35, 0, 0.25, 1) forwards;
+    }
+
+    /* 階段一：精緻手寫信箋 */
+    .origami-letter {
+      position: absolute;
+      inset: 0;
+      background: #fffdfa;
+      border: 2px solid #f2cfd7;
+      border-radius: 14px;
+      box-shadow: 0 12px 28px rgba(214, 95, 127, 0.18), 0 3px 8px rgba(214, 95, 127, 0.08);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 10px;
+      box-sizing: border-box;
+      transform-origin: center center;
+    }
+    .origami-letter::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 48px;
+      border-bottom: 1.5px dashed rgba(214, 95, 127, 0.3);
+      background: linear-gradient(180deg, #fff2f5 0%, #fffdfa 100%);
+      border-radius: 12px 12px 0 0;
+      pointer-events: none;
+    }
+    .letter-content {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      z-index: 1;
+    }
+    .letter-heart {
+      font-size: 28px;
+      line-height: 1;
+      filter: drop-shadow(0 2px 4px rgba(214, 95, 127, 0.3));
+      animation: heartBeat 1s ease-in-out infinite alternate;
+    }
+    .letter-rule {
+      width: 72px;
+      height: 3px;
+      background: #ffd6df;
+      border-radius: 2px;
+    }
+    .letter-rule.short { width: 46px; }
+
+    .plane-overlay.launching .origami-letter {
+      animation: foldLetter 4.6s ease-in-out forwards;
+    }
+
+    /* 階段二：立體質感紙飛機（由信紙折疊成型，機頭朝右） */
+    .origami-plane {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transform-origin: center center;
+      opacity: 0;
+    }
+    .plane-overlay.launching .origami-plane {
+      animation: unfoldPlane 4.6s ease-in-out forwards;
+    }
+    .plane-svg {
+      width: 135px;
+      height: 95px;
+      filter: drop-shadow(0 12px 20px rgba(169, 66, 97, 0.24));
+    }
+
+    /* 伴隨微風虛線與愛心尾流 */
+    .wind-trail {
+      position: absolute;
+      left: -120px;
+      top: 25px;
+      width: 140px;
+      height: 50px;
+      pointer-events: none;
+      opacity: 0;
+    }
+    .plane-overlay.launching .wind-trail {
+      animation: windFade 4.6s ease-in-out forwards;
+    }
+    .plane-trail {
+      position: absolute;
+      left: -18px;
+      top: 50%;
+      transform: translateY(-50%);
+      pointer-events: none;
+      opacity: 0;
+    }
+    .plane-overlay.launching .plane-trail {
+      animation: trailFade 4.6s ease-in-out forwards;
+    }
+    .trail-heart {
+      position: absolute;
+      font-size: 14px;
+      color: var(--pink-700);
+      opacity: 0;
+    }
+    .trail-heart.th1 { left: -25px; top: -8px; animation: floatHeart 1.1s ease-out 2.5s infinite; }
+    .trail-heart.th2 { left: -48px; top: 10px; font-size: 11px; animation: floatHeart 1.1s ease-out 2.8s infinite; }
+    .trail-heart.th3 { left: -70px; top: -2px; font-size: 16px; color: #ed839f; animation: floatHeart 1.1s ease-out 3.1s infinite; }
+
+    /* 底部情感文案切換 */
+    .caption-box {
+      margin-top: 36px;
+      height: 30px;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+    }
+    .caption-text {
+      position: absolute;
+      font-size: 15px;
+      font-weight: 800;
+      color: var(--pink-900);
+      letter-spacing: 0.08em;
+      white-space: nowrap;
+      opacity: 0;
+      transform: translateY(6px);
+    }
+    .plane-overlay.launching .cap-1 {
+      animation: captionPhase1 4.6s ease-in-out forwards;
+    }
+    .plane-overlay.launching .cap-2 {
+      animation: captionPhase2 4.6s ease-in-out forwards;
+    }
+
+    /* ══════════ 折疊與向右飛行核心關鍵影格 (4.6s 溫柔細緻節奏) ══════════ */
+    @keyframes foldLetter {
+      0% {
+        opacity: 0;
+        transform: scale(0.7) translateY(24px);
+      }
+      12% {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+      }
+      30% {
+        /* 停留清晰展現信箋、愛心與手寫感 */
+        opacity: 1;
+        transform: scale(1) rotate(0deg);
+      }
+      44% {
+        /* 優雅向內摺入、收合兩翼 */
+        opacity: 0.95;
+        transform: scaleX(0.4) scaleY(0.85) rotateX(25deg);
+        box-shadow: 0 4px 10px rgba(214, 95, 127, 0.25);
+      }
+      52% {
+        /* 完全摺平成中線，由紙飛機接棒展開 */
+        opacity: 0;
+        transform: scaleX(0.08) scaleY(0.7) rotate(15deg);
+      }
+      100% {
+        opacity: 0;
+        transform: scaleX(0.05) scaleY(0.5);
+      }
+    }
+
+    @keyframes unfoldPlane {
+      0%, 42% {
+        opacity: 0;
+        transform: scaleX(0.1) scaleY(0.7) rotate(-15deg);
+      }
+      52% {
+        /* 從摺痕中破繭展翼 */
+        opacity: 1;
+        transform: scaleX(0.68) scaleY(0.9) rotate(5deg);
+      }
+      62% {
+        /* 完整成型，在中央優雅懸停、呼吸挺立 */
+        opacity: 1;
+        transform: scale(1.06) rotate(12deg);
+      }
+      70% {
+        /* 乘風蓄力：微向下沉，機頭昂揚迎接氣流 */
+        opacity: 1;
+        transform: scale(1) rotate(16deg) translate(-10px, 5px);
+      }
+      100% {
+        opacity: 1;
+        transform: scale(1) rotate(15deg);
+      }
+    }
+
+    @keyframes flightPath {
+      0%, 62% {
+        /* 前半段停留在中央展示折疊與成型 */
+        transform: translate(0, 0);
+      }
+      68% {
+        /* 蓄力起跑 */
+        transform: translate(-14px, 8px) scale(0.98);
+      }
+      75% {
+        /* 迎風加速，流暢向右滑翔 */
+        transform: translate(45px, -12px) scale(1.02);
+      }
+      86% {
+        /* 優雅掠過右方天空 */
+        transform: translate(160px, -45px) scale(0.96);
+      }
+      100% {
+        /* 悠然滑翔飛出右側螢幕 */
+        transform: translate(calc(55vw + 170px), -85px) scale(0.85);
+        opacity: 0.1;
+      }
+    }
+
+    @keyframes windFade {
+      0%, 65% { opacity: 0; }
+      72% { opacity: 0.95; }
+      93% { opacity: 0.6; }
+      100% { opacity: 0; }
+    }
+    @keyframes trailFade {
+      0%, 68% { opacity: 0; }
+      74% { opacity: 1; }
+      100% { opacity: 1; }
+    }
+    @keyframes floatHeart {
+      0% { opacity: 0; transform: translate(0, 0) scale(0.6); }
+      30% { opacity: 0.85; }
+      100% { opacity: 0; transform: translate(-38px, 22px) scale(1.2) rotate(-20deg); }
+    }
+
+    @keyframes captionPhase1 {
+      0% { opacity: 0; transform: translateY(8px); }
+      10% { opacity: 1; transform: translateY(0); }
+      48% { opacity: 1; transform: translateY(0); }
+      55% { opacity: 0; transform: translateY(-8px); }
+      100% { opacity: 0; }
+    }
+    @keyframes captionPhase2 {
+      0%, 54% { opacity: 0; transform: translateY(8px); }
+      62% { opacity: 1; transform: translateY(0); }
+      94% { opacity: 1; transform: translateY(0); }
+      100% { opacity: 0; transform: translateY(-6px); }
+    }
+    @keyframes heartBeat {
+      from { transform: scale(1); }
+      to { transform: scale(1.18); }
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      margin: 0 0 10px;
+      color: var(--pink-900);
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: .11em;
+      text-transform: uppercase;
+    }
+    .eyebrow::before { content: ""; display: block; width: 18px; height: 1px; background: currentColor; }
+    h1, h2, p { margin-top: 0; }
+    h1 {
+      max-width: 480px;
+      margin-bottom: 11px;
+      color: var(--ink);
+      font-family: ui-rounded, "PingFang TC", "Noto Sans TC", "Microsoft JhengHei", sans-serif;
+      font-size: clamp(26px, 7.4vw, 37px);
+      font-weight: 850;
+      line-height: 1.23;
+      letter-spacing: -.055em;
+    }
+    .subheading {
+      margin-bottom: 22px;
+      color: var(--ink-soft);
+      font-size: 14px;
+      font-weight: 520;
+      line-height: 1.75;
+    }
+    .small-note { color: var(--ink-soft); font-size: 11px; line-height: 1.55; }
+    .button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 52px;
+      padding: 13px 20px;
+      color: #fff;
+      font-size: 15px;
+      font-weight: 800;
+      letter-spacing: .02em;
+      text-decoration: none;
+      background: linear-gradient(135deg, #ed839f, #cf5175);
+      border: 0;
+      border-radius: 17px;
+      box-shadow: 0 6px 0 #b53f62, 0 12px 20px rgba(181, 63, 98, .20);
+      cursor: pointer;
+      transition: transform .16s var(--ease-out), filter .16s var(--ease-out), box-shadow .16s var(--ease-out);
+    }
+    .button:hover { filter: brightness(1.035); transform: translateY(-2px); box-shadow: 0 8px 0 #b53f62, 0 15px 22px rgba(181,63,98,.20); }
+    .button:active { transform: translateY(3px) scale(.975); box-shadow: 0 2px 0 #b53f62, 0 5px 10px rgba(181,63,98,.15); }
+    .button:focus-visible, .choice-card:focus-visible, .icon-button:focus-visible { outline: 3px solid rgba(214,95,127,.34); outline-offset: 3px; }
+    .button.wide { width: 100%; }
+    .button.cream {
+      color: var(--pink-900);
+      background: #fff4d8;
+      box-shadow: 0 6px 0 #e9c874, 0 12px 20px rgba(204,167,75,.15);
+    }
+    .button.cream:active { box-shadow: 0 2px 0 #e9c874, 0 5px 10px rgba(204,167,75,.15); }
+    .button.cream:hover { box-shadow: 0 8px 0 #e9c874, 0 15px 22px rgba(204,167,75,.17); }
+    .button:disabled { cursor: not-allowed; filter: grayscale(.16); opacity: .58; box-shadow: 0 3px 0 #b98f9e; }
+    .button-row { display: flex; align-items: center; gap: 11px; }
+    .message {
+      display: none;
+      margin: 13px 2px 0;
+      padding: 11px 13px;
+      color: #a64960;
+      font-size: 13px;
+      font-weight: 700;
+      line-height: 1.55;
+      background: #fff0f1;
+      border: 1px solid #ffcbd3;
+      border-radius: 13px;
+    }
+    .message.show { display: block; animation: messageIn .22s var(--ease-out); }
+    .message.success { color: #8a653b; background: #fff8df; border-color: #ffe6a4; }
+
+    /* Step transition: only one page is available at a time. */
+    .step { display: none; opacity: 0; }
+    .step.active { display: block; animation: pageIn .42s var(--ease-out) both; }
+    .step.leaving { display: block; pointer-events: none; animation: pageOut .2s ease-out both; }
+    @keyframes pageIn { from { opacity: 0; transform: translateY(14px) scale(.985); } to { opacity: 1; transform: translateY(0) scale(1); } }
+    @keyframes pageOut { from { opacity: 1; transform: translateY(0); } to { opacity: 0; transform: translateY(-7px); } }
+    @keyframes messageIn { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: translateY(0); } }
+
+    /* Step 2: 破冰相框與追逐按鈕 */
+    .hello-page { text-align: center; }
+    .hello-page .eyebrow { justify-content: center; }
+    .photo-stage {
+      position: relative;
+      display: grid;
+      place-items: center;
+      width: 200px;
+      height: 200px;
+      margin: 6px auto 27px;
+    }
+    .photo-stage::before, .photo-stage::after {
+      content: "";
+      position: absolute;
+      width: 34px;
+      height: 34px;
+      background: var(--pink-300);
+      border-radius: 11px 15px 11px 15px;
+      transform: rotate(16deg);
+    }
+    .photo-stage::before { left: -8px; bottom: 15px; }
+    .photo-stage::after { right: -11px; top: 11px; width: 22px; height: 22px; background: var(--butter); transform: rotate(-17deg); }
+    .photo-frame {
+      position: relative;
+      display: grid;
+      place-items: center;
+      width: 200px;
+      height: 200px;
+      overflow: hidden;
+      background: linear-gradient(135deg, #ffcfd9, #fff1dd 65%, #ffe4ae);
+      border: 8px solid #fffdfa;
+      border-radius: 34px 29px 37px 29px;
+      box-shadow: 0 9px 0 rgba(230, 157, 168, .30), 0 18px 26px rgba(173,95,107,.12);
+      transform: rotate(-2.2deg);
+    }
+    .photo-frame.has-image .photo-placeholder { display: none; }
+    #memoryPhoto { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: none; }
+    .photo-frame.has-image #memoryPhoto { display: block; }
+    .photo-placeholder { text-align: center; color: #bd6f82; transform: rotate(2.2deg); }
+    .photo-placeholder .mini-heart { display: block; margin-bottom: 9px; font-size: 54px; line-height: 1; filter: drop-shadow(0 5px 0 rgba(255,255,255,.47)); }
+    .photo-placeholder span { display: block; font-size: 11px; font-weight: 800; letter-spacing: .08em; }
+    .photo-helper { margin: 9px 0 0; color: var(--ink-soft); font-size: 10px; line-height: 1.45; }
+    .photo-helper a { color: var(--pink-900); font-weight: 800; text-underline-offset: 2px; }
+    .hello-page h1 { margin-right: auto; margin-left: auto; }
+    
+    .yes-no-zone {
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 15px;
+      min-height: 160px;
+      margin: 20px 0 11px;
+    }
+    .no-column {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      transition: transform 0.28s var(--ease-out);
+      will-change: transform;
+      z-index: 10;
+    }
+    .no-column.runaway {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      margin: 0;
+      pointer-events: auto;
+    }
+    #noButton {
+      min-width: 82px;
+      min-height: 44px;
+      padding: 9px 16px;
+      color: #9c6c74;
+      font-size: 14px;
+      font-weight: 750;
+      background: #ffeaee;
+      border: 1px solid #ffd1da;
+      border-radius: 14px;
+      box-shadow: 0 3px 0 #ebb8c2, 0 6px 14px rgba(181, 63, 98, .08);
+      cursor: pointer;
+      user-select: none;
+      transform-origin: center center;
+      transition: transform .18s var(--ease-out), background .18s var(--ease-out);
+    }
+    #noButton:hover {
+      background: #ffe3e8;
+    }
+    #yesButton {
+      transform-origin: center center;
+      transition: transform .22s var(--ease-out);
+      z-index: 5;
+    }
+    .persuasion {
+      display: none;
+      max-width: 170px;
+      margin: 7px 0 0;
+      color: #b54766;
+      font-size: 11px;
+      font-weight: 800;
+      line-height: 1.35;
+      text-align: center;
+      white-space: normal;
+      word-break: break-word;
+      pointer-events: none;
+      animation: messageIn .2s var(--ease-out);
+    }
+    .persuasion.visible { display: block; }
+
+    /* Step 3: 日期時間 */
+    .form-grid { display: grid; gap: 13px; margin: 23px 0 13px; }
+    .field label { display: block; margin-bottom: 7px; color: var(--ink); font-size: 13px; font-weight: 800; letter-spacing: .02em; }
+    .input-wrap {
+      position: relative;
+      display: flex;
+      align-items: center;
+      background: #fffdfa;
+      border: 1.5px solid #ecd8d2;
+      border-radius: 16px;
+      box-shadow: 0 4px 0 rgba(236,216,210,.6);
+      transition: border-color .18s var(--ease-out), box-shadow .18s var(--ease-out);
+    }
+    .input-wrap:focus-within { border-color: var(--pink-700); box-shadow: 0 4px 0 rgba(214,95,127,.28), 0 0 0 3px rgba(214,95,127,.12); }
+    .input-wrap input, .detail-input {
+      width: 100%;
+      min-height: 51px;
+      padding: 12px 14px;
+      color: var(--ink);
+      font-size: 14px;
+      font-weight: 700;
+      background: transparent;
+      border: 0;
+      outline: none;
+    }
+    .date-preview {
+      display: none;
+      gap: 8px;
+      align-items: center;
+      margin: 11px 0 21px;
+      padding: 11px 13px;
+      color: var(--pink-900);
+      font-size: 12px;
+      font-weight: 750;
+      background: #fff1f4;
+      border: 1px dashed var(--pink-300);
+      border-radius: 14px;
+    }
+    .date-preview.show { display: flex; animation: messageIn .2s var(--ease-out); }
+    .future-note { margin: -1px 0 17px; color: #a46d65; font-size: 11px; }
+
+    /* Step 4: 約會守則 */
+    .rule-list { display: grid; gap: 11px; margin: 18px 0 21px; }
+    .rule-card {
+      position: relative;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-height: 55px;
+      padding: 12px 14px;
+      background: #fffdfa;
+      border: 1.5px solid #eedfd9;
+      border-radius: 16px;
+      box-shadow: 0 3px 0 rgba(238,223,217,.75);
+      cursor: pointer;
+      user-select: none;
+      transition: transform .16s var(--ease-out), border-color .16s var(--ease-out), background .16s var(--ease-out);
+    }
+    .rule-card:hover { transform: translateY(-1px); }
+    .rule-card.checked { background: #fff7f9; border-color: #f3a9bc; }
+    .rule-card input { position: absolute; opacity: 0; pointer-events: none; }
+    .fake-checkbox {
+      display: grid;
+      place-items: center;
+      flex-shrink: 0;
+      width: 22px;
+      height: 22px;
+      color: #fff;
+      font-size: 14px;
+      font-weight: 900;
+      background: #fff;
+      border: 2px solid #e6c4c4;
+      border-radius: 8px 8px 8px 3px;
+      transition: background .18s var(--ease-out), border .18s var(--ease-out), transform .18s var(--ease-out);
+    }
+    .checked .fake-checkbox { background: var(--pink-700); border-color: var(--pink-700); transform: rotate(-4deg); }
+    .rule-copy { font-size: 13px; font-weight: 690; line-height: 1.55; }
+    .rule-copy b { margin-right: 2px; color: var(--pink-900); }
+    .shake { animation: shake .38s var(--ease-in-out); }
+    @keyframes shake { 0%,100% { transform: translateX(0); } 20% { transform: translateX(-7px) rotate(-.5deg); } 40% { transform: translateX(6px) rotate(.5deg); } 60% { transform: translateX(-4px); } 80% { transform: translateX(3px); } }
+
+    /* Step 5: 心願清單 */
+    .choice-grid { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 11px; margin: 19px 0 22px; }
+    .choice-card {
+      position: relative;
+      min-height: 119px;
+      padding: 15px 12px;
+      color: var(--ink);
+      text-align: left;
+      background: #fffdfa;
+      border: 1.5px solid #efdfd9;
+      border-radius: 19px;
+      box-shadow: 0 4px 0 rgba(238,216,210,.72);
+      cursor: pointer;
+      transition: border .18s var(--ease-out), background .18s var(--ease-out), box-shadow .18s var(--ease-out), transform .18s var(--ease-out);
+    }
+    .choice-card:hover { transform: translateY(-2px); box-shadow: 0 6px 0 rgba(238,216,210,.72); }
+    .choice-card.selected { background: linear-gradient(145deg, #fff5f5, #ffecf0); border-color: var(--pink-500); box-shadow: 0 5px 0 rgba(234,128,154,.24), 0 9px 18px rgba(202,91,122,.09); }
+    .choice-card.selected::after { content: "✓"; position: absolute; top: 10px; right: 10px; display: grid; place-items: center; width: 20px; height: 20px; color: #fff; font-size: 12px; font-weight: 900; background: var(--pink-700); border-radius: 50%; }
+    .choice-icon { display: block; margin-bottom: 8px; font-size: 29px; line-height: 1; }
+    .choice-card strong { display: block; max-width: 105px; font-size: 13px; line-height: 1.35; }
+    .choice-card.other { grid-column: 1 / -1; min-height: 108px; padding-right: 13px; }
+    .other-layout { display: grid; grid-template-columns: auto 1fr; gap: 12px; align-items: center; }
+    .other .choice-icon { margin: 0; }
+    .other-copy { display: grid; gap: 6px; }
+    .other-copy strong { max-width: none; }
+    #otherInput { min-height: 39px; padding: 8px 10px; font-size: 12px; background: rgba(255,255,255,.78); border-radius: 11px; box-shadow: none; }
+
+    /* Step 6: 細節確定 */
+    .detail-intro {
+      display: flex;
+      gap: 9px;
+      align-items: flex-start;
+      margin: 1px 0 17px;
+      padding: 11px 13px;
+      color: #805f4c;
+      font-size: 12px;
+      font-weight: 650;
+      line-height: 1.55;
+      background: #fff7df;
+      border: 1px solid #f9e3a3;
+      border-radius: 14px;
+    }
+    .detail-fields { display: grid; gap: 13px; margin-bottom: 19px; }
+    .detail-block {
+      padding: 14px;
+      background: #fffdfa;
+      border: 1px solid #f0dfd9;
+      border-radius: 17px;
+      box-shadow: 0 3px 0 rgba(241,220,214,.66);
+    }
+    .detail-block label { display: flex; gap: 8px; align-items: center; margin-bottom: 10px; color: var(--ink); font-size: 13px; font-weight: 800; line-height: 1.35; }
+    .detail-block .detail-input { min-height: 49px; padding: 11px 12px; font-size: 13px; }
+    .detail-block textarea.detail-input { min-height: 76px; resize: vertical; }
+    .answered-other { margin: -1px 0 10px; padding: 8px 10px; color: var(--pink-900); font-size: 11px; font-weight: 700; line-height: 1.45; background: #fff0f2; border-radius: 10px; }
+    .plan-peek {
+      display: grid;
+      gap: 6px;
+      margin: 7px 0 19px;
+      padding: 13px 14px;
+      background: linear-gradient(135deg, rgba(255,239,228,.85), rgba(255,236,243,.88));
+      border: 1px solid #f7d8d4;
+      border-radius: 16px;
+    }
+    .plan-peek span { color: var(--ink-soft); font-size: 10px; font-weight: 800; letter-spacing: .08em; }
+    .plan-peek strong { color: var(--ink); font-size: 13px; line-height: 1.55; }
+
+    /* Step 8 (完結頁小約定摘要卡片) */
+    .final-summary {
+      width: 100%;
+      max-width: 360px;
+      margin: 18px auto 14px;
+      padding: 14px;
+      text-align: left;
+      background: rgba(255,255,255,.76);
+      border: 1px dashed rgba(214,95,127,.34);
+      border-radius: 16px;
+    }
+    .final-summary b { display: block; margin-bottom: 7px; color: var(--pink-900); font-size: 11px; letter-spacing: .07em; }
+    .final-summary p { margin: 0; color: var(--ink); font-size: 12px; font-weight: 680; line-height: 1.65; }
+    .final-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; width: 100%; max-width: 360px; margin: 0 auto; }
+    .final-actions .button { min-height: 48px; padding: 11px 10px; font-size: 13px; }
+    .tiny-privacy { margin: 15px auto 0; max-width: 330px; color: #af8d85; font-size: 10px; line-height: 1.55; text-align: center; }
+
+    /* Confetti / heart rain */
+    #celebrationLayer { position: fixed; z-index: 50; inset: 0; pointer-events: none; overflow: hidden; }
+    .confetti {
+      position: absolute;
+      top: -38px;
+      color: var(--pink-700);
+      font-size: var(--size, 21px);
+      line-height: 1;
+      opacity: 0;
+      filter: drop-shadow(0 2px 1px rgba(146,61,83,.16));
+      animation: fall var(--duration, 1.7s) cubic-bezier(.22,.65,.42,1) var(--delay, 0s) forwards;
+    }
+    @keyframes fall {
+      0% { opacity: 0; transform: translate3d(0,-30px,0) rotate(0deg) scale(.7); }
+      12% { opacity: 1; }
+      100% { opacity: .08; transform: translate3d(var(--drift, 30px), 110vh, 0) rotate(var(--spin, 220deg)) scale(1.16); }
+    }
+    .pop-heart { position: fixed; z-index: 55; color: var(--pink-700); font-size: 22px; pointer-events: none; animation: popHeart .75s var(--ease-out) forwards; }
+    @keyframes popHeart { from { opacity: 0; transform: translate(-50%, -30%) scale(.4); } 20% { opacity: 1; } to { opacity: 0; transform: translate(-50%, -120px) scale(1.3) rotate(10deg); } }
+
+    /* Modal summary confirmation */
+    .modal-backdrop { position: fixed; z-index: 60; inset: 0; display: none; place-items: center; padding: 20px; background: rgba(83,54,47,.29); backdrop-filter: blur(5px); }
+    .modal-backdrop.show { display: grid; animation: fade .2s ease-out both; }
+    .modal { width: min(100%, 390px); padding: 23px 20px 19px; background: #fffdf9; border: 1px solid rgba(255,255,255,.95); border-radius: 24px; box-shadow: 0 22px 60px rgba(75,39,36,.25); animation: modalIn .28s var(--ease-out) both; }
+    .modal h2 { margin: 0 0 9px; color: var(--ink); font-size: 21px; letter-spacing: -.04em; }
+    .modal p { margin: 0 0 15px; color: var(--ink-soft); font-size: 13px; line-height: 1.65; }
+    .modal-summary { max-height: 250px; margin: 0 0 17px; padding: 12px; overflow: auto; color: var(--ink); font-size: 12px; line-height: 1.7; background: #fff5f5; border-radius: 13px; white-space: pre-line; }
+    .modal-actions { display: flex; gap: 10px; }
+    .modal-actions .button { flex: 1; min-height: 47px; padding: 10px 9px; font-size: 13px; }
+    .modal-cancel { color: var(--ink-soft); background: #f2ebe7; box-shadow: 0 5px 0 #ddd1cc; }
+    .modal-cancel:active { box-shadow: 0 2px 0 #ddd1cc; }
+    @keyframes fade { from { opacity: 0; } to { opacity: 1; } }
+    @keyframes modalIn { from { opacity: 0; transform: translateY(10px) scale(.97); } to { opacity: 1; transform: translateY(0) scale(1); } }
+
+    @media (min-width: 540px) {
+      .app-shell { padding-top: 22px; }
+      .paper-card { min-height: 706px; }
+      .choice-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+      .choice-card.other { grid-column: 1 / -1; }
+    }
+    @media (max-height: 680px) {
+      .paper-card { min-height: calc(100dvh - 75px); padding-top: 23px; }
+      .photo-stage { width: 159px; height: 159px; margin-bottom: 16px; }
+      .photo-frame { width: 159px; height: 159px; border-width: 6px; }
+      .photo-placeholder .mini-heart { font-size: 44px; }
+      .hello-page h1 { font-size: 26px; }
+      .subheading { margin-bottom: 17px; }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .001ms !important; animation-iteration-count: 1 !important; transition-duration: .001ms !important; }
+    }
+
+
+    .audio-hint-pill {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%) translateY(20px);
+      background: rgba(85, 54, 47, 0.92);
+      color: #fff;
+      font-size: 12px;
+      font-weight: 600;
+      padding: 8px 18px;
+      border-radius: 999px;
+      box-shadow: 0 8px 26px rgba(142, 75, 82, 0.28);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      opacity: 0;
+      pointer-events: none;
+      transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+      z-index: 9999;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+    .audio-hint-pill.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+      pointer-events: auto;
+      animation: pillPulse 2s ease-in-out infinite;
+    }
+    @keyframes pillPulse {
+      0%, 100% { transform: translateX(-50%) translateY(0) scale(1); }
+      50% { transform: translateX(-50%) translateY(0) scale(1.04); }
+    }
+
+    /* 序章：專屬開場信件頁面 */
+    .cover-page {
+      text-align: center;
+      padding: 36px 24px 32px;
+      position: relative;
+      overflow: hidden;
+    }
+    .envelope-art-wrap {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin: 10px auto 26px;
+      height: 120px;
+    }
+    .envelope-art {
+      position: relative;
+      width: 148px;
+      height: 100px;
+      background: linear-gradient(135deg, #ffd6e0 0%, #fca4be 100%);
+      border-radius: 14px;
+      box-shadow: 0 16px 36px rgba(169, 66, 97, 0.22), 0 4px 12px rgba(169, 66, 97, 0.12);
+      border: 1.5px solid rgba(255, 255, 255, 0.75);
+    }
+    .envelope-art .letter-sheet {
+      position: absolute;
+      left: 14px;
+      right: 14px;
+      top: -24px;
+      height: 84px;
+      background: #ffffff;
+      border-radius: 8px 8px 4px 4px;
+      box-shadow: 0 -4px 16px rgba(169, 66, 97, 0.12);
+      border: 1px solid #ffe1e8;
+      padding: 10px 10px 8px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      animation: letterSheetFloat 2.6s ease-in-out infinite alternate;
+    }
+    @keyframes letterSheetFloat {
+      0% { transform: translateY(0); }
+      100% { transform: translateY(-8px); }
+    }
+    .letter-heart-mark {
+      font-size: 17px;
+      color: #e25c7e;
+      line-height: 1;
+      margin-bottom: 7px;
+      animation: heartBeat 1.4s ease-in-out infinite alternate;
+    }
+    .letter-lines {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+    .letter-lines i {
+      display: block;
+      height: 3px;
+      background: #fcd5df;
+      border-radius: 2px;
+    }
+    .letter-lines i:nth-child(1) { width: 85%; margin: 0 auto; }
+    .letter-lines i:nth-child(2) { width: 70%; margin: 0 auto; }
+    .letter-lines i:nth-child(3) { width: 45%; margin: 0 auto; }
+    .envelope-front {
+      position: absolute;
+      inset: 0;
+      border-radius: 14px;
+      overflow: hidden;
+      pointer-events: none;
+    }
+    .envelope-front::before {
+      content: "";
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 0;
+      height: 0;
+      border-style: solid;
+      border-width: 0 0 56px 74px;
+      border-color: transparent transparent #f79cb5 transparent;
+      opacity: 0.95;
+    }
+    .envelope-front::after {
+      content: "";
+      position: absolute;
+      bottom: 0;
+      right: 0;
+      width: 0;
+      height: 0;
+      border-style: solid;
+      border-width: 0 74px 56px 0;
+      border-color: transparent transparent #f28da9 transparent;
+      opacity: 0.95;
+    }
+    .envelope-seal {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -35%);
+      font-size: 34px;
+      line-height: 1;
+      filter: drop-shadow(0 4px 8px rgba(169, 66, 97, 0.3));
+      animation: sealPulse 2s ease-in-out infinite alternate;
+      z-index: 5;
+    }
+    @keyframes sealPulse {
+      0% { transform: translate(-50%, -35%) scale(0.95); }
+      100% { transform: translate(-50%, -35%) scale(1.08); }
+    }
+    #stepCover .paper-card {
+      background: linear-gradient(175deg, rgba(255, 253, 248, 0.97) 0%, rgba(255, 248, 244, 0.95) 50%, rgba(254, 242, 245, 0.97) 100%);
+      border-color: rgba(238, 218, 210, 0.92);
+      box-shadow: 0 20px 48px rgba(160, 110, 125, 0.14), 0 4px 12px rgba(160, 110, 125, 0.08);
+      text-align: center;
+    }
+    #stepCover .paper-card::after {
+      border: 1px dashed rgba(225, 175, 185, 0.38);
+    }
+    .cover-subheading {
+      margin-bottom: 26px;
+      font-size: 14.5px;
+      color: var(--ink-soft);
+      line-height: 1.65;
+    }
+    .cover-open-btn {
+      font-size: 15.5px !important;
+      padding: 16px 20px !important;
+      letter-spacing: 0.02em;
+      box-shadow: 0 10px 24px rgba(169, 66, 97, 0.3) !important;
+      animation: coverBtnGlow 2.4s ease-in-out infinite alternate;
+    }
+    @keyframes coverBtnGlow {
+      0% { transform: scale(1); box-shadow: 0 10px 24px rgba(169, 66, 97, 0.28); }
+      100% { transform: scale(1.02); box-shadow: 0 14px 30px rgba(169, 66, 97, 0.42); }
+    }
+    .cover-open-btn:active {
+      transform: scale(0.97) !important;
+    }
+    .cover-footnote {
+      margin-top: 14px;
+      font-size: 12px;
+      color: #9d7b74;
+    }
+  </style>
+</head>
+<body data-step="cover">
+  <main class="app-shell" aria-live="polite">
+    <span class="blob one"></span><span class="blob two"></span><span class="blob three"></span>
+    <header class="topbar" aria-label="邀約流程進度">
+      <div class="brand">
+        <div class="stamp" aria-hidden="true">♥</div>
+        <div class="brand-copy"><strong>小萱與我</strong><span>just for us</span></div>
+      </div>
+      <div class="topbar-right">
+        <!-- 常駐唱片背景音樂按鈕 -->
+        <button id="musicToggle" class="music-toggle paused" type="button" aria-label="播放或暫停背景音樂" title="點擊播放背景音樂">
+          <span class="disc-icon">🎵</span>
+        </button>
+        <div class="progress-wrap">
+          <div class="progress-dots" aria-hidden="true">
+            <i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
+          </div>
+          <span class="progress-text" id="progressText">序章 / 08</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- 💌 序章：獨立開場信件頁面 (信件視覺 + 按下按鈕打開只屬於我們的篇章) -->
+    <section class="step active" id="stepCover" data-step="cover" aria-labelledby="coverTitle">
+      <div class="paper-card cover-page">
+        <div class="letter-glow" aria-hidden="true"></div>
+        <div class="envelope-art-wrap" aria-hidden="true">
+          <div class="envelope-art">
+            <div class="letter-sheet">
+              <div class="letter-heart-mark">♥</div>
+              <div class="letter-lines">
+                <i></i>
+                <i></i>
+                <i></i>
+              </div>
+            </div>
+            <div class="envelope-front"></div>
+            <div class="envelope-seal">💌</div>
+          </div>
+        </div>
+
+        <p class="eyebrow">A Special Letter For You</p>
+        <h1 id="coverTitle">給妳的一封信</h1>
+        <p class="subheading cover-subheading">
+          這裡記錄了我這段時間想對妳說的話<br>準備了這份專屬於我們的禮物。
+        </p>
+
+        <button class="button wide cover-open-btn" id="openStoryBtn" type="button">
+          按下按鈕打開只屬於我們的篇章
+        </button>
+      </div>
+    </section>
+
+    <!-- Step 0: 心聲第一章 · 備禮的用心 -->
+    <section class="step" id="step0" data-step="0" aria-labelledby="chapter0Title">
+      <div class="paper-card">
+        <div class="letter-glow" aria-hidden="true"></div>
+        <p class="eyebrow">Chapter One</p>
+        <h1 id="chapter0Title">第一章</h1>
+        <div class="letter-stage">
+          <p>
+            冷靜這段時間我想了很多。之前會起衝突，是當時我不知道該怎麼好好跟你說想休息這件事。這段期間我花很多時間寫程式，bug 改了一遍又一遍，準備了這份禮物。難哄這部劇我看了兩遍，也從裡面想了很多關於我們之間的事，知道兩個人相處本來就不容易。只是讓你知道，我認真看待這段感情。
+          </p>
+        </div>
+        <button class="button wide" id="toStep1Btn" type="button">下一頁 ➔</button>
+      </div>
+    </section>
+
+    <!-- Step 1: 心聲第二章 · 堅定與陪伴 -->
+    <section class="step" id="step1" data-step="1" aria-labelledby="chapter1Title">
+      <div class="paper-card">
+        <div class="letter-glow" aria-hidden="true"></div>
+        <p class="eyebrow">Chapter Two</p>
+        <h1 id="chapter1Title">第二章</h1>
+        <div class="letter-stage">
+          <p>
+            我一開始真的很需要一個答案，所以我問了你"要不要跟我在一起"，然後你給我的答案是不知道，你後面也有解釋，其實當時我就覺得我可以接受這個答案，但因為當時就已經想好要做這些東西給你了，但我很怕我做了之後我們分開，所以我才會想要一個答案，但最後我自己還是堅信我們會在一起的，我反覆問了自己好幾次。我知道你現在很忙，有工作有功課，你很難有其他心力去處理感情的事情，我現在也在學會努力不要把整個人的重心都在你身上，我們都有各自的生活，相處的時間少了，但還是可以在一起啊，我們就用少少的時間陪伴，我覺得我也很開心。我其實不知道讓你休息的這些天，你在想什麼，我其實也很害怕，你會不會就說你不想繼續了，但我相信你不會的，我相信你心裡還是有我的，只是你很彆扭都不敢說。
+          </p>
+        </div>
+        <button class="button wide" id="toStep2Btn" type="button">所以，我想問妳... 💌</button>
+      </div>
+    </section>
+
+    <!-- Step 2: 破冰提問 · 古風水墨詩意（原第 1 頁） -->
+    <section class="step" id="step2" data-step="2" aria-labelledby="helloTitle">
+      <div class="paper-card hello-page">
+        <!-- Decorative Classical Atmosphere for "山有木兮木有枝，心悦君兮君不知" -->
+        <div class="traditional-seal" aria-hidden="true">心<br>悅</div>
+        <svg class="bg-branch" viewBox="0 0 220 180" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <path d="M-10 15 C50 20, 90 60, 130 45 C165 32, 190 60, 220 50" stroke="rgba(125, 95, 88, 0.38)" stroke-width="2.5" stroke-linecap="round"/>
+          <path d="M75 32 C92 10, 120 5, 140 10" stroke="rgba(125, 95, 88, 0.28)" stroke-width="1.8" stroke-linecap="round"/>
+          <path d="M130 45 C148 68, 178 78, 205 72" stroke="rgba(125, 95, 88, 0.22)" stroke-width="1.5" stroke-linecap="round"/>
+          <circle cx="130" cy="45" r="7.5" fill="rgba(247, 168, 184, 0.7)"/>
+          <circle cx="130" cy="45" r="3.2" fill="rgba(235, 105, 130, 0.9)"/>
+          <circle cx="140" cy="10" r="6" fill="rgba(247, 168, 184, 0.65)"/>
+          <circle cx="140" cy="10" r="2.5" fill="rgba(235, 105, 130, 0.85)"/>
+          <circle cx="92" cy="22" r="5" fill="rgba(247, 168, 184, 0.55)"/>
+          <circle cx="185" cy="55" r="7" fill="rgba(247, 168, 184, 0.7)"/>
+          <circle cx="185" cy="55" r="3" fill="rgba(235, 105, 130, 0.85)"/>
+          <circle cx="215" cy="50" r="5" fill="rgba(247, 168, 184, 0.6)"/>
+          <circle cx="165" cy="72" r="6" fill="rgba(247, 168, 184, 0.55)"/>
+        </svg>
+        <svg class="bg-mountains" viewBox="0 0 600 130" preserveAspectRatio="none" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <path d="M0 130 L0 80 Q90 35 180 65 T370 50 Q460 25 540 60 T600 48 L600 130 Z" fill="rgba(182, 215, 200, 0.22)"/>
+          <path d="M0 130 L0 98 Q110 68 230 90 T460 76 Q530 68 600 90 L600 130 Z" fill="rgba(152, 195, 178, 0.25)"/>
+          <path d="M0 130 L0 112 Q140 92 280 108 T540 98 L600 110 L600 130 Z" fill="rgba(130, 180, 162, 0.20)"/>
+        </svg>
+        <div class="petals-layer" aria-hidden="true">
+          <span class="petal petal-1"></span>
+          <span class="petal petal-2"></span>
+          <span class="petal petal-3"></span>
+          <span class="petal petal-4"></span>
+        </div>
+
+        <p class="eyebrow">A tiny question</p>
+        <div class="photo-stage" aria-label="專屬照片放置區">
+          <div class="photo-frame has-image" id="photoFrame">
+            <img id="memoryPhoto" src="https://media1.giphy.com/media/v1.Y2lkPTc5MGI3NjExZmE2cTRhcDhycjJ4aXhwdWhsZTBha3dxeWVjMm53eDNlaTlvdDlnYiZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/6C9gvbueaPF8LGMHsQ/giphy.gif" alt="可愛動圖" />
+            <div class="photo-placeholder"><span class="mini-heart">♡</span><span>放一張我們的照片</span></div>
+          </div>
+        </div>
+        <h1 id="helloTitle">要不要跟我和好呀？</h1>
+        <p class="subheading poetic-subheading">「山有木兮木有枝，<br>心悦君兮君不知。」</p>
+        <div class="yes-no-zone" id="yesNoZone">
+          <button class="button" id="yesButton" type="button">要 ❤️</button>
+          <div class="no-column" id="noColumn">
+            <button id="noButton" type="button" aria-label="不要，但這個按鈕會逃跑">不要</button>
+            <p class="persuasion" id="persuasion" aria-live="polite"></p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Step Proposal: 11/1 見面約定 (確定我們兩個的時間) -->
+    <section class="step" id="stepProposal" data-step="proposal" aria-labelledby="proposalTitle">
+      <div class="paper-card">
+        <!-- Decorative Maple Stamp -->
+        <div class="maple-stamp" aria-hidden="true">
+          <span>🍁 11.01 · 重逢</span>
+        </div>
+
+        <p class="eyebrow">Part one · our date proposal</p>
+        <h1 id="proposalTitle">那我們約 11/1<br>見面好嗎？🍁</h1>
+        <p class="subheading">我把回國後的隔天留給妳，想當面把準備好的禮物送給妳，時間由妳決定！</p>
+
+        <div class="proposal-story">
+          <div class="proposal-story-quote" aria-hidden="true">“</div>
+          <p>
+            我從加拿大回來的隔天（11/1）就想見到妳。這段時間除了反覆寫程式、改 bug 準備這份禮物，心裡也一直想著妳。希望回國第一時間，約在我們彼此最熟悉的老地方，親手把這份心意交到妳手上。
+          </p>
+        </div>
+
+        <div class="proposal-plan-card">
+          <div class="plan-card-row">
+            <span class="plan-card-icon" aria-hidden="true">📅</span>
+            <div class="plan-card-info">
+              <span class="plan-card-label">約定日期</span>
+              <span class="plan-card-val">11 月 1 日（星期日）</span>
+            </div>
+          </div>
+          <div class="plan-card-row plan-card-row-time">
+            <span class="plan-card-icon" aria-hidden="true">⏰</span>
+            <div class="plan-card-info" style="width: 100%;">
+              <label for="proposalTimeInput" class="plan-card-label">見面時間（由妳訂幾點都可以 ✨）</label>
+              <div class="input-wrap time proposal-time-wrap">
+                <input type="time" id="proposalTimeInput" value="18:30" required aria-label="11月1日想見面的時間" />
+              </div>
+            </div>
+          </div>
+          <div class="plan-card-row">
+            <span class="plan-card-icon" aria-hidden="true">📍</span>
+            <div class="plan-card-info">
+              <span class="plan-card-label">約定地點</span>
+              <span class="plan-card-val">我們彼此最熟悉的地方</span>
+            </div>
+          </div>
+          <div class="plan-card-row">
+            <span class="plan-card-icon" aria-hidden="true">🎁</span>
+            <div class="plan-card-info">
+              <span class="plan-card-label">專屬心意</span>
+              <span class="plan-card-val">親手把這份禮物送給妳</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="proposal-actions">
+          <button class="button wide proposal-yes-btn" id="proposalYesBtn" type="button">
+            可以，11/1 見面 ❤️
+          </button>
+          <button class="button wide cream proposal-no-btn" id="proposalNoBtn" type="button">
+            不可以，我想挑其他日期 🥺
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Step 3: 約會時間挑選（自選日期） -->
+    <section class="step" id="step3" data-step="3" aria-labelledby="dateTitle">
+      <div class="paper-card">
+        <!-- Decorative Twilight Star Orbit -->
+        <svg class="bg-stars" viewBox="0 0 160 120" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <path d="M125 18 L127 30 L139 32 L127 34 L125 46 L123 34 L111 32 L123 30 Z" fill="rgba(185, 155, 235, 0.65)" class="twinkle-slow"/>
+          <path d="M45 35 L46 42 L53 43 L46 44 L45 51 L44 44 L37 43 L44 42 Z" fill="rgba(240, 175, 210, 0.65)" class="twinkle-fast"/>
+          <path d="M88 72 L89 77 L94 78 L89 79 L88 84 L87 79 L82 78 L87 77 Z" fill="rgba(248, 205, 155, 0.7)" class="twinkle-slow"/>
+          <circle cx="145" cy="65" r="2.5" fill="rgba(180, 150, 230, 0.45)"/>
+          <circle cx="30" cy="18" r="2" fill="rgba(235, 155, 185, 0.5)"/>
+        </svg>
+
+        <p class="eyebrow">Part one · pick a date</p>
+        <h1 id="dateTitle">那我們什麼時候<br>見面呢？📅</h1>
+        <p class="subheading">挑一天妳有空的日子，<br>我都聽妳的！</p>
+        <div class="form-grid">
+          <div class="field">
+            <label for="dateInput">想見面的日期</label>
+            <div class="input-wrap date"><input type="date" id="dateInput" required /></div>
+          </div>
+          <div class="field">
+            <label for="timeInput">差不多幾點呢？</label>
+            <div class="input-wrap time"><input type="time" id="timeInput" value="18:30" required /></div>
+          </div>
+        </div>
+        <p class="future-note"><b>小提醒</b> 只能選擇 11 月 1 日之後的時間唷，因為那時候我才回國了。</p>
+        <div class="date-preview" id="datePreview"><span class="preview-heart">💌</span><span id="datePreviewText"></span></div>
+        <button class="button wide" id="confirmDateButton" type="button">確認這個時間</button>
+        <p class="message" id="dateMessage" role="alert"></p>
+        <div style="text-align:center;"><button class="text-link-btn" id="backToProposalBtn" type="button">◂ 回到 11/1 見面約定</button></div>
+      </div>
+    </section>
+
+    <!-- Step 4: 約會守則（原第 3 頁） -->
+    <section class="step" id="step4" data-step="4" aria-labelledby="rulesTitle">
+      <div class="paper-card">
+        <!-- Decorative Scroll Ribbon Stamp -->
+        <div class="scroll-stamp" aria-hidden="true">
+          <span>PROMISE · 守則</span>
+        </div>
+
+        <p class="eyebrow">Part two · pinky promise</p>
+        <h1 id="rulesTitle">專屬我們的<br>約會守則 📜</h1>
+        <p class="subheading">出門前請先答應我這幾條小約定～</p>
+        <div class="rule-list" id="ruleList">
+          <label class="rule-card"><input type="checkbox" data-rule="hug" /><span class="fake-checkbox" aria-hidden="true"></span><span class="rule-copy"><b>1.</b>見面時不能擺臭臉。</span></label>
+          <label class="rule-card"><input type="checkbox" data-rule="talk" /><span class="fake-checkbox" aria-hidden="true"></span><span class="rule-copy"><b>2.</b>今天不准生氣，有什麼不開心都要直接說。</span></label>
+          <label class="rule-card"><input type="checkbox" data-rule="eat" /><span class="fake-checkbox" aria-hidden="true"></span><span class="rule-copy"><b>3.</b>一起吃好吃的。</span></label>
+          <label class="rule-card"><input type="checkbox" data-rule="hands" /><span class="fake-checkbox" aria-hidden="true"></span><span class="rule-copy"><b>4.</b>不要不耐煩。</span></label>
+          <label class="rule-card"><input type="checkbox" data-rule="love" /><span class="fake-checkbox" aria-hidden="true"></span><span class="rule-copy"><b>5.</b>你自己想。</span></label>
+        </div>
+        <button class="button wide" id="rulesButton" type="button">我答應遵守，下一步</button>
+        <p class="message" id="rulesMessage" role="alert">還有約定沒有打勾勾喔！要全部答應才能進入下一步 🥺</p>
+      </div>
+    </section>
+
+    <!-- Step 5: 心願清單（原第 4 頁） -->
+    <section class="step" id="step5" data-step="5" aria-labelledby="activityTitle">
+      <div class="paper-card">
+        <!-- Decorative Carnival Pastel Float -->
+        <svg class="bg-carnival" viewBox="0 0 200 130" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <circle cx="172" cy="28" r="14" fill="rgba(255, 185, 210, 0.4)"/>
+          <circle cx="188" cy="56" r="9" fill="rgba(175, 225, 248, 0.4)"/>
+          <circle cx="26" cy="38" r="12" fill="rgba(255, 235, 168, 0.45)"/>
+          <path d="M152 76 L155 83 L162 84 L156 87 L157 94 L151 89 L146 92 L148 85 Z" fill="rgba(255, 200, 150, 0.5)"/>
+          <path d="M38 85 L39 90 L44 91 L39 92 L38 97 L37 92 L32 91 L37 90 Z" fill="rgba(245, 170, 210, 0.5)"/>
+        </svg>
+
+        <p class="eyebrow">Part three · our little list</p>
+        <h1 id="activityTitle">那一天，妳想<br>做什麼？✨</h1>
+        <p class="subheading">可以多選喔，想做什麼我都陪妳去！</p>
+        <div class="choice-grid" id="activityGrid">
+          <button class="choice-card" type="button" data-activity="movie" aria-pressed="false"><span class="choice-icon">🍿</span><strong>看電影</strong></button>
+          <button class="choice-card" type="button" data-activity="dinner" aria-pressed="false"><span class="choice-icon">🍽️</span><strong>吃大餐 / 小吃</strong></button>
+          <button class="choice-card" type="button" data-activity="games" aria-pressed="false"><span class="choice-icon">🎮</span><strong>去網咖 / 玩遊戲</strong></button>
+          <button class="choice-card" type="button" data-activity="cafe" aria-pressed="false"><span class="choice-icon">☕</span><strong>去咖啡廳聊天</strong></button>
+          <button class="choice-card" type="button" data-activity="walk" aria-pressed="false"><span class="choice-icon">🚶</span><strong>戶外散步</strong></button>
+          <div class="choice-card other" id="otherCard" data-activity="other" role="button" tabindex="0" aria-pressed="false">
+            <div class="other-layout"><span class="choice-icon">✏️</span><div class="other-copy"><strong>其他想做的事</strong><input id="otherInput" type="text" maxlength="80" placeholder="寫下妳的小心願…" aria-label="其他想做的事情" /></div></div>
+          </div>
+        </div>
+        <button class="button wide" id="activitiesButton" type="button">選好了，下一步</button>
+        <p class="message" id="activitiesMessage" role="alert">至少選一個妳想做的事情嘛～</p>
+      </div>
+    </section>
+
+    <!-- Step 6: 細節確定（原第 5 頁） -->
+    <section class="step" id="step6" data-step="6" aria-labelledby="detailsTitle">
+      <div class="paper-card">
+        <!-- Decorative Washi Tape / Journal Element -->
+        <div class="washi-tape" aria-hidden="true"></div>
+
+        <p class="eyebrow">Part four · fill it with love</p>
+        <h1 id="detailsTitle">太棒了！那我們來<br>確定細節 📝</h1>
+        <p class="subheading">妳負責許願，我來把每一個小細節記下來。</p>
+        <div class="detail-intro"><span>✦</span><span>這些欄位依照妳剛剛的選擇生成；不確定也可以先留白，我會再問妳。</span></div>
+        <div class="detail-fields" id="detailFields"></div>
+        <div class="plan-peek"><span>目前的約會草稿</span><strong id="planPeek">正在整理中…</strong></div>
+        <button class="button wide" id="submitPlanButton" type="button">全部完成，送出約會計畫 ❤️</button>
+      </div>
+    </section>
+
+    <!-- Step 7: 最後你想跟我說什麼 (密語互動關卡) -->
+    <section class="step" id="step7" data-step="7" aria-labelledby="secretTitle">
+      <div class="paper-card">
+        <h1 id="secretTitle">最後你想跟我說什麼</h1>
+        <div class="secret-box">
+          <div class="input-wrap secret-wrap" id="secretWrap">
+            <input type="text" id="secretInput" placeholder="請輸入想對我說的話…" autocomplete="off" />
+          </div>
+          <p class="message" id="secretMsg" role="alert">你喜歡誰?</p>
+          <button class="button wide" id="secretSubmitBtn" type="button">確認送出 💌</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Step 8: 我也喜歡你 (終極大結局 · 彈窗愛心 ➔ 滿版彈窗風暴) -->
+    <section class="step" id="step8" data-step="8" aria-labelledby="finalTitle">
+      <div class="paper-card final-page">
+        <!-- 愛心正中央：「我也喜歡你」核心文字 (完全不被愛心擋到) -->
+        <div class="center-hero" id="centerHero">
+          <div class="center-hero-heart">💖</div>
+          <h1 class="grand-love-title center-hero-text" id="finalTitle">我也喜歡你</h1>
+        </div>
+
+        <!-- 彈窗動態舞台容器 -->
+        <div id="popupStage" class="popup-stage" aria-hidden="true"></div>
+
+        <!-- 隱藏保留 DOM 元件以利 JavaScript 背景運作 -->
+        <div style="display:none;" aria-hidden="true">
+          <p id="finalSummaryText"></p>
+          <button id="copyButton" type="button">複製小約定</button>
+          <a id="lineShareButton" href="#">LINE 分享</a>
+          <p id="deliveryNote"></p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- 浪漫手折紙飛機全螢幕動畫層：信折成紙飛機 ➔ 流暢往右起飛 -->
+  <div id="planeOverlay" class="plane-overlay" aria-hidden="true">
+    <div class="origami-sky">
+      <div class="flight-stage">
+        <div class="origami-actor">
+          <!-- 階段一：精緻手寫信箋 -->
+          <div class="origami-letter">
+            <div class="letter-content">
+              <span class="letter-heart">💌</span>
+              <div class="letter-rule"></div>
+              <div class="letter-rule short"></div>
+            </div>
+          </div>
+
+          <!-- 階段二：立體質感紙飛機（由信紙折疊成型，機頭朝右） -->
+          <div class="origami-plane">
+            <!-- 氣流微風虛線 -->
+            <svg class="wind-trail" viewBox="0 0 140 50" fill="none">
+              <path d="M 0 35 Q 60 45, 130 25" stroke="#f287a5" stroke-width="2.2" stroke-linecap="round" stroke-dasharray="5 7"/>
+              <path d="M 25 45 Q 75 52, 125 38" stroke="#ffc6d4" stroke-width="1.8" stroke-linecap="round" stroke-dasharray="4 6"/>
+            </svg>
+
+            <!-- 3D 摺紙機體 (精準向右上方飛行視角) -->
+            <svg class="plane-svg" viewBox="0 0 140 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <defs>
+                <linearGradient id="topWingGrad" x1="0%" y1="0%" x2="100%" y2="80%">
+                  <stop offset="0%" stop-color="#ffffff"/>
+                  <stop offset="60%" stop-color="#fff2f6"/>
+                  <stop offset="100%" stop-color="#fedce5"/>
+                </linearGradient>
+                <linearGradient id="bottomWingGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stop-color="#ffccd8"/>
+                  <stop offset="100%" stop-color="#f8a2b5"/>
+                </linearGradient>
+                <linearGradient id="keelGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stop-color="#f38ba2"/>
+                  <stop offset="100%" stop-color="#d65f7f"/>
+                </linearGradient>
+              </defs>
+              
+              <!-- 底部龍骨/機腹陰影 (立體厚度感) -->
+              <polygon points="12,52 132,24 64,68" fill="url(#keelGrad)" stroke="#c24b6d" stroke-width="1.5" stroke-linejoin="round"/>
+              <!-- 下主翼 (背光面) -->
+              <polygon points="12,52 132,24 82,90" fill="url(#bottomWingGrad)" stroke="#d65f7f" stroke-width="2" stroke-linejoin="round"/>
+              <!-- 上主翼 (受光面，白粉微透高光) -->
+              <polygon points="12,52 132,24 58,62" fill="url(#topWingGrad)" stroke="#d65f7f" stroke-width="2" stroke-linejoin="round"/>
+              <!-- 中間立體脊線折痕 -->
+              <line x1="12" y1="52" x2="132" y2="24" stroke="#a94261" stroke-width="2.6" stroke-linecap="round"/>
+              <!-- 機翼折邊反光 -->
+              <line x1="58" y1="62" x2="132" y2="24" stroke="#ffffff" stroke-width="1.2" stroke-linecap="round"/>
+            </svg>
+
+            <!-- 尾端伴隨飄落的小愛心 -->
+            <div class="plane-trail">
+              <span class="trail-heart th1">♥</span>
+              <span class="trail-heart th2">✦</span>
+              <span class="trail-heart th3">♥</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 底部情感文案切換 -->
+      <div class="caption-box">
+        <span class="caption-text cap-1">將心意折成信箋……</span>
+        <span class="caption-text cap-2">已送出 ✈️</span>
+      </div>
+    </div>
+  </div>
+
+  <div id="celebrationLayer" aria-hidden="true"></div>
+
+  <div class="modal-backdrop" id="summaryModal" role="dialog" aria-modal="true" aria-labelledby="modalTitle" aria-hidden="true">
+    <div class="modal">
+      <h2 id="modalTitle">最後確認一下 💌</h2>
+      <p>這份約會計畫準備送出囉。確認後會為妳發射紙飛機，也會寄到信箱。</p>
+      <div class="modal-summary" id="modalSummary"></div>
+      <div class="modal-actions">
+        <button class="button modal-cancel" id="modalCancel" type="button">再改一下</button>
+        <button class="button" id="modalConfirm" type="button">確認送出</button>
+      </div>
+    </div>
+  </div>
+
+
+
+  <script>
+    /*
+      ───────────────── CONFIG：專案各項參數設定 ─────────────────
+      1. PHOTO_URL：換成你們照片的公開網址或本機檔名（例如 "./our-photo.jpg"）。
+      2. WEBHOOK_URL：部署的 Google Apps Script Web App 網址（已設定完成）。
+      3. GMAIL_RECIPIENT：指定收件地址。
+      4. BGM：關卡專屬背景音樂路徑清單（可填入 MP3 檔名或線上音訊網址，留空則延續播放）。
+      5. PERSUASION_LINES：點擊「不要」按鈕每次逃跑後的撒嬌台詞。
+      ─────────────────────────────────────────────────────────
+    */
+    const CONFIG = {
+      PHOTO_URL: "https://media1.giphy.com/media/v1.Y2lkPTc5MGI3NjExZmE2cTRhcDhycjJ4aXhwdWhsZTBha3dxeWVjMm53eDNlaTlvdDlnYiZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/6C9gvbueaPF8LGMHsQ/giphy.gif",
+      PHOTO_FALLBACK_LINK: "https://images.unsplash.com/",
+      WEBHOOK_URL: "https://script.google.com/macros/s/AKfycbxD4H2qAvkKHLui_xTNaF1VC38OuZ9yvNNDLfa09gkia6QG3xBeeCis9pgvTjQN6wG1/exec",
+      GMAIL_RECIPIENT: "liguanwei666@gmail.com",
+      WEBHOOK_MODE: "apps-script",
+      WEBHOOK_METHOD: "POST",
+
+      // ════════════════════════════════════════════════════════════════════
+      // 🎵 背景音樂 (BGM) 清單：共 4 首專屬音樂配置（全部支援自動循環播放）
+      // ① 第一章：music1.mp3
+      // ② 第二章：music2.mp3
+      // ③ 第三章開始～第七章：music3.mp3（全流程連貫播放，跨頁絕不中斷重置）
+      // ④ 最後一章（我也喜歡你 愛心大結局）：music4.mp3
+      // ════════════════════════════════════════════════════════════════════
+      BGM: {
+        step0: "./music1.mp3", // ① 第一章專屬音樂
+        step1: "./music2.mp3", // ② 第二章專屬音樂
+        step2: "./music3.mp3", // ③ 第三章開始（破冰）
+        step3: "./music3.mp3", // ③ 約會時間挑選（連貫播放）
+        step4: "./music3.mp3", // ③ 約會守則承諾（連貫播放）
+        step5: "./music3.mp3", // ③ 心願清單（連貫播放）
+        step6: "./music3.mp3", // ③ 動態手帳與紙飛機（連貫播放）
+        step7: "./music3.mp3", // ③ 最後你想跟我說什麼（連貫播放）
+        step8: "./music4.mp3"  // ④ 最後一章大結局（我也喜歡你 專屬音樂）
+      },
+
+      PERSUASION_LINES: [
+        "妳確定嗎？🥺",
+        "再想一下嘛……",
+        "寶貝跟我和好嘛～好不好？",
+        "這一個月沒有妳，真的很不習慣。",
+        "我真的很想妳 😭",
+        "別躲了～快點投降啦！",
+        "按鈕都已經大成這樣了，只能選『要』了啦！😤",
+        "（按鈕太小抓不到囉，乖乖按『要』吧 ❤️）",
+        "再按一次我就要開始哭哭了喔……",
+        "妳的手指是不是在故意欺負我 🥺",
+        "我都把『要』放到最大聲了，還不明白嗎？",
+        "不要再躲啦，我準備好抱抱妳了！",
+        "最後提醒一次：按『要』有驚喜喔 ❤️",
+        "這不是選擇題，是我想和妳和好的心意呀。",
+        "好啦好啦，這次真的不能再拒絕我了～",
+        "妳看，『要』都快佔滿畫面了！",
+        "妳真的捨得一直點不要嗎？🥺",
+        "不管妳點幾次，我都一定會追上妳！🏃‍♂️💨",
+        "手手點酸了嗎？讓我牽著妳好不好？",
+        "妳按了這麼多次不要，其實是在考驗我的真心對吧？",
+        "報告！我對妳的真心已經通過 999 次考驗！",
+        "好嘛～全世界最可愛的寶貝，原諒我這一次啦 ❤️",
+        "我的心已經全部交給妳了，不能退貨喔！",
+        "就算妳點 100 次，我還是只想和妳和好！",
+        "好啦投降了～快按那個超大的『要 ❤️』吧！"
+      ]
+    };
+
+    const activityInfo = {
+      movie:  { icon: "🍿", name: "看電影", label: "想看哪部電影？或是哪種類型的片？", placeholder: "例如：想看愛情片、動畫還是妳指定一部…" },
+      dinner: { icon: "🍽️", name: "吃大餐 / 小吃", label: "想吃什麼料理？或是妳收藏很久沒吃的餐廳？", placeholder: "例如：火鍋、鐵板燒?，或一間想去很久的店…" },
+      games:  { icon: "🎮", name: "去網咖 / 玩遊戲", label: "想一起玩什麼遊戲呢？", placeholder: "例如：倉鼠?，或著你有特別想要的…" },
+      cafe:   { icon: "☕", name: "去咖啡廳聊天", label: "想去哪一區的咖啡廳？", placeholder: "例如：中山、信義，或一間有大窗戶的店…" },
+      walk:   { icon: "🚶", name: "戶外散步", label: "想去哪裡吹吹風、走一走？", placeholder: "例如：河濱、公園、看夜景的地方…" },
+      other:  { icon: "✏️", name: "其他", label: "還有什麼想補充的小細節？", placeholder: "我會把妳的心願也一起排進行程。" }
+    };
+
+    const state = {
+      step: "cover",
+      noClicks: 0,
+      yesScale: 1,
+      noScale: 1,
+      date: "",
+      time: "18:30",
+      rules: { hug: false, talk: false, eat: false, hands: false, love: false },
+      activities: new Set(),
+      details: {},
+      otherText: "",
+      secretMessage: "",
+      lastDelivery: "none"
+    };
+
+    const $ = selector => document.querySelector(selector);
+    const $$ = selector => document.querySelectorAll(selector);
+
+    const elements = {
+      progressText: $("#progressText"),
+      yesButton: $("#yesButton"),
+      noButton: $("#noButton"),
+      persuasion: $("#persuasion"),
+      noColumn: $("#noColumn"),
+      yesNoZone: $("#yesNoZone"),
+      dateInput: $("#dateInput"),
+      timeInput: $("#timeInput"),
+      datePreview: $("#datePreview"),
+      datePreviewText: $("#datePreviewText"),
+      dateMessage: $("#dateMessage"),
+      rulesMessage: $("#rulesMessage"),
+      activitiesMessage: $("#activitiesMessage"),
+      otherInput: $("#otherInput"),
+      otherCard: $("#otherCard"),
+      detailFields: $("#detailFields"),
+      planPeek: $("#planPeek"),
+      finalSummaryText: $("#finalSummaryText"),
+      lineShareButton: $("#lineShareButton"),
+      deliveryNote: $("#deliveryNote"),
+      celebrationLayer: $("#celebrationLayer"),
+      summaryModal: $("#summaryModal"),
+      modalSummary: $("#modalSummary"),
+      musicToggle: $("#musicToggle"),
+      secretInput: $("#secretInput"),
+      secretMsg: $("#secretMsg"),
+      secretWrap: $("#secretWrap"),
+      secretSubmitBtn: $("#secretSubmitBtn"),
+      planeOverlay: $("#planeOverlay"),
+      proposalYesBtn: $("#proposalYesBtn"),
+      proposalNoBtn: $("#proposalNoBtn"),
+      proposalTimeInput: $("#proposalTimeInput"),
+      backToProposalBtn: $("#backToProposalBtn")
+    };
+
+    // ════════════════════════════════════════════════════════════════════
+    // 🎵 背景音樂管理器 (保證全曲循環播放、相同音樂跨頁無縫連播不中斷)
+    // ════════════════════════════════════════════════════════════════════
+    const bgmPlayer = new Audio();
+    bgmPlayer.loop = true;
+    bgmPlayer.preload = "auto";
+    bgmPlayer.addEventListener("ended", () => {
+      // 雙重循環保險：確保所有瀏覽器結束時皆自動循環從頭播放
+      bgmPlayer.currentTime = 0;
+      bgmPlayer.play().catch(() => {});
+    });
+
+    const bgmState = {
+      isPlaying: false,
+      currentTrack: "",
+      userUnlocked: false
+    };
+
+    function isSameTrack(trackA, trackB) {
+      if (!trackA || !trackB) return false;
+      if (trackA === trackB) return true;
+      const getFileName = s => decodeURIComponent(String(s)).split(/[?#]/)[0].split("/").pop().toLowerCase();
+      return getFileName(trackA) === getFileName(trackB);
+    }
+
+    function updateMusicToggleUI() {
+      const btn = elements.musicToggle;
+      const pill = document.getElementById("audioHintPill");
+      if (bgmState.isPlaying && pill) {
+        pill.classList.remove("show");
+      }
+      if (!btn) return;
+      if (bgmState.isPlaying) {
+        btn.classList.add("playing");
+        btn.classList.remove("paused");
+        btn.title = "點擊暫停背景音樂";
+      } else {
+        btn.classList.remove("playing");
+        btn.classList.add("paused");
+        btn.title = "點擊播放背景音樂";
+      }
+    }
+
+    let bgmFadeToken = 0;
+
+    async function fadePlay(src) {
+      if (!src) return;
+      // 若已經在播放同一首歌曲，絕對不重新載入或重設進度，保持無縫連貫播放！
+      if (isSameTrack(src, bgmState.currentTrack)) {
+        if (bgmPlayer.paused && bgmState.userUnlocked) {
+          bgmPlayer.play().then(() => {
+            bgmState.isPlaying = true;
+            updateMusicToggleUI();
+          }).catch(() => {});
+        }
+        return;
+      }
+
+      const currentToken = ++bgmFadeToken;
+
+      try {
+        if (!bgmPlayer.paused && bgmPlayer.src) {
+          // 平滑淡出上一首
+          let vol = bgmPlayer.volume;
+          while (vol > 0.08) {
+            if (bgmFadeToken !== currentToken) return;
+            vol -= 0.15;
+            bgmPlayer.volume = Math.max(0, vol);
+            await new Promise(r => setTimeout(r, 50));
+          }
+        }
+        if (bgmFadeToken !== currentToken) return;
+        bgmPlayer.pause();
+        bgmPlayer.src = src;
+        bgmPlayer.currentTime = 0;
+        bgmPlayer.volume = 0;
+        bgmPlayer.loop = true;
+        bgmState.currentTrack = src;
+
+        const playPromise = bgmPlayer.play();
+        if (playPromise !== undefined) {
+          bgmState.isPlaying = true;
+          updateMusicToggleUI();
+          await playPromise;
+          if (bgmFadeToken !== currentToken) return;
+          // 平滑淡入新曲
+          let vol = 0;
+          while (vol < 0.85) {
+            if (bgmFadeToken !== currentToken) return;
+            vol += 0.12;
+            bgmPlayer.volume = Math.min(0.85, vol);
+            await new Promise(r => setTimeout(r, 50));
+          }
+        }
+      } catch (err) {
+        console.log("音訊播放等待首次互動或檔案載入：", err);
+        // 如果 .mp3 載入失敗，嘗試備份 .mp3.mp4
+        if (src.endsWith(".mp3") && !src.endsWith(".mp3.mp4")) {
+          const fallbackSrc = src + ".mp4";
+          console.warn(`嘗試載入備用音訊格式：${fallbackSrc}`);
+          fadePlay(fallbackSrc);
+          return;
+        }
+        bgmState.isPlaying = false;
+        updateMusicToggleUI();
+      }
+    }
+
+    // 計算當前步驟應播放的曲目（Step 2～Step 7 全部鎖定為第 3 首 music3.mp3，跨頁連貫不中斷）
+    function getEffectiveTrackForStep(stepIndex) {
+      if (stepIndex === "cover") {
+        return CONFIG.BGM.step0 || "./music1.mp3";
+      }
+      if (stepIndex === "proposal" || (stepIndex >= 2 && stepIndex <= 7)) {
+        return CONFIG.BGM.step2 || "./music3.mp3";
+      }
+      return CONFIG.BGM[`step${stepIndex}`] || CONFIG.BGM.step0 || "./music1.mp3";
+    }
+
+    function switchBgmForStep(stepIndex) {
+      if (stepIndex === "cover") return;
+      const targetTrack = getEffectiveTrackForStep(stepIndex);
+      // 如果目標曲目與目前播放曲目相同，絕對不重新播放，維持連貫進行！
+      if (isSameTrack(targetTrack, bgmState.currentTrack)) {
+        if (bgmPlayer.paused && bgmState.userUnlocked) {
+          bgmPlayer.play().then(() => {
+            bgmState.isPlaying = true;
+            updateMusicToggleUI();
+          }).catch(() => {});
+        }
+        return;
+      }
+      if (targetTrack && bgmState.userUnlocked) {
+        fadePlay(targetTrack);
+      }
+    }
+
+    function toggleMusic() {
+      if (bgmPlayer.paused || !bgmState.isPlaying) {
+        const trackToPlay = bgmState.currentTrack || getEffectiveTrackForStep(state.step);
+        if (trackToPlay) {
+          bgmState.userUnlocked = true;
+          fadePlay(trackToPlay);
+        }
+      } else {
+        bgmPlayer.pause();
+        bgmState.isPlaying = false;
+        updateMusicToggleUI();
+      }
+    }
+
+    // 瀏覽器安全政策處理：載入時先直接嘗試主動自動播放，若被攔截則掛載多重輕觸解鎖
+    function tryAutoplayOnLoad() {
+      if (state.step === "cover") return; // 開場信件頁面透過點擊「按下按鈕打開只屬於我們的篇章」優雅開啟
+      const initialTrack = getEffectiveTrackForStep(0);
+      if (!initialTrack) return;
+      // 嘗試直接自動播放
+      fadePlay(initialTrack).then(() => {
+        bgmState.userUnlocked = true;
+      }).catch(err => {
+        console.log("瀏覽器攔截無互動自動播放，提示輕觸解鎖：", err);
+        const pill = document.getElementById("audioHintPill");
+        if (pill && !bgmState.isPlaying) {
+          pill.classList.add("show");
+        }
+      });
+    }
+
+    function unlockAudioOnFirstTouch() {
+      const pill = document.getElementById("audioHintPill");
+      if (pill) pill.classList.remove("show");
+      if (!bgmState.userUnlocked) {
+        bgmState.userUnlocked = true;
+        const initialTrack = getEffectiveTrackForStep(state.step);
+        if (initialTrack && bgmPlayer.paused) {
+          fadePlay(initialTrack);
+        }
+      }
+    }
+    ["click", "touchstart", "pointerdown", "keydown"].forEach(evt => {
+      window.addEventListener(evt, unlockAudioOnFirstTouch, { once: true, passive: true });
+      document.addEventListener(evt, unlockAudioOnFirstTouch, { once: true, passive: true });
+    });
+    elements.musicToggle.addEventListener("click", event => {
+      event.stopPropagation();
+      toggleMusic();
+    });
+
+    // 💌 專屬開場「按下按鈕打開只屬於我們的篇章」點擊事件
+    const openStoryBtn = document.getElementById("openStoryBtn");
+    if (openStoryBtn) {
+      openStoryBtn.addEventListener("click", () => {
+        // 1. 百分之百解鎖瀏覽器限制，立即啟動並平滑淡入第一章音樂
+        bgmState.userUnlocked = true;
+        fadePlay(CONFIG.BGM.step0 || "./music1.mp3");
+
+        // 2. 播散浪漫愛心微粒並流暢切換至第一章
+        throwTinyHearts({ x: window.innerWidth / 2, y: window.innerHeight / 2 });
+        showStep(0);
+      });
+    }
+
+    // Optional image setup. The fallback stays entirely inside this file.
+    (function setupPhoto() {
+      const photo = $("#memoryPhoto");
+      const frame = $("#photoFrame");
+      const link = $("#photoSourceLink");
+      if (link) link.href = CONFIG.PHOTO_URL || CONFIG.PHOTO_FALLBACK_LINK;
+      if (!CONFIG.PHOTO_URL || !photo) return;
+      photo.src = CONFIG.PHOTO_URL;
+      if (photo.complete && photo.naturalWidth !== 0) {
+        if (frame) frame.classList.add("has-image");
+      }
+      photo.onload = () => frame && frame.classList.add("has-image");
+      photo.onerror = () => frame && frame.classList.remove("has-image");
+    })();
+
+    function getMinDate() {
+      const now = new Date();
+      const year = now.getFullYear();
+      // 只能選擇 11/1 號以後
+      return `${year}-11-01`;
+    }
+    elements.dateInput.min = getMinDate();
+
+    function escapeHTML(value) {
+      return String(value ?? "").replace(/[&<>'"]/g, char => ({ "&":"&amp;", "<":"&lt;", ">":"&gt;", "'":"&#39;", '"':"&quot;" })[char]);
+    }
+    function formatDate(dateValue) {
+      if (!dateValue) return "尚未選擇日期";
+      const date = new Date(dateValue + "T12:00:00");
+      return new Intl.DateTimeFormat("zh-TW", { month: "long", day: "numeric", weekday: "long" }).format(date);
+    }
+    function formatTime(timeValue) {
+      if (!timeValue) return "尚未選擇時間";
+      return timeValue;
+    }
+    function selectedActivityNames() {
+      return Array.from(state.activities).map(key => activityInfo[key]?.name || key).join("、") || "尚未選擇";
+    }
+
+    function updateProgress() {
+      if (state.step === "cover") {
+        elements.progressText.textContent = "序章 / 08";
+        $$(".progress-dots i").forEach(dot => dot.classList.remove("done"));
+      } else if (state.step === "proposal") {
+        elements.progressText.textContent = "04 / 08";
+        $$(".progress-dots i").forEach((dot, index) => {
+          dot.classList.toggle("done", index <= 3);
+        });
+      } else if (state.step === 8) {
+        elements.progressText.textContent = "完成 ♥";
+        $$(".progress-dots i").forEach(dot => dot.classList.add("done"));
+      } else {
+        const currentNum = Number(state.step) + 1;
+        elements.progressText.textContent = `0${currentNum} / 08`;
+        $$(".progress-dots i").forEach((dot, index) => {
+          dot.classList.toggle("done", index <= Number(state.step));
+        });
+      }
+    }
+
+    function showMessage(element, text, variant = "") {
+      element.textContent = text;
+      element.className = `message show ${variant}`;
+    }
+    function hideMessage(element) { element.className = "message"; }
+
+    function showStep(nextStep) {
+      let targetId = "step" + nextStep;
+      if (nextStep === "cover") targetId = "stepCover";
+      if (nextStep === "proposal") targetId = "stepProposal";
+      const current = $(".step.active");
+      const next = document.getElementById(targetId);
+      if (!next || current === next) return;
+      state.step = nextStep;
+      document.body.setAttribute("data-step", String(nextStep));
+      updateProgress();
+      if (nextStep !== "cover") {
+        switchBgmForStep(nextStep); // 依關卡自動切換音樂
+      }
+
+      if (current) {
+        current.classList.remove("active");
+        current.classList.add("leaving");
+        window.setTimeout(() => current.classList.remove("leaving"), 205);
+      }
+      window.setTimeout(() => {
+        next.classList.add("active");
+        window.scrollTo({ top: 0, behavior: "smooth" });
+        if (nextStep === 8 && typeof runTkinterLoveShow === "function") {
+          runTkinterLoveShow();
+        }
+      }, current ? 170 : 0);
+    }
+
+    function throwTinyHearts(origin) {
+      for (let i = 0; i < 7; i++) {
+        const heart = document.createElement("span");
+        heart.className = "pop-heart";
+        heart.textContent = ["♥", "♡", "✦"][i % 3];
+        heart.style.left = `${origin.x + (Math.random() - .5) * 60}px`;
+        heart.style.top = `${origin.y + (Math.random() - .5) * 22}px`;
+        heart.style.color = i % 3 === 2 ? "#e9ae4b" : "#db5d81";
+        document.body.appendChild(heart);
+        window.setTimeout(() => heart.remove(), 800);
+      }
+    }
+    function celebrate(amount = 42) {
+      const pieces = ["♥", "♡", "✦", "✿", "●"];
+      for (let i = 0; i < amount; i++) {
+        const piece = document.createElement("span");
+        piece.className = "confetti";
+        piece.textContent = pieces[Math.floor(Math.random() * pieces.length)];
+        piece.style.left = `${Math.random() * 100}%`;
+        piece.style.setProperty("--size", `${13 + Math.random() * 18}px`);
+        piece.style.setProperty("--delay", `${Math.random() * .5}s`);
+        piece.style.setProperty("--duration", `${1.25 + Math.random() * 1.25}s`);
+        piece.style.setProperty("--drift", `${-65 + Math.random() * 130}px`);
+        piece.style.setProperty("--spin", `${-250 + Math.random() * 500}deg`);
+        if (i % 5 === 0) piece.style.color = "#eab650";
+        if (i % 7 === 0) piece.style.color = "#f08f76";
+        elements.celebrationLayer.appendChild(piece);
+        window.setTimeout(() => piece.remove(), 2900);
+      }
+    }
+
+    // Step 0 前進按鈕
+    $("#toStep1Btn").addEventListener("click", () => showStep(1));
+
+    // Step 1 前進按鈕
+    $("#toStep2Btn").addEventListener("click", () => showStep(2));
+
+    // 25 組精密計算之按鈕隨機逃跑座標
+    const runawayPositions = [
+      { x: 90,  y: -45 },
+      { x: -90, y: -40 },
+      { x: 85,  y: 45 },
+      { x: -85, y: 45 },
+      { x: 0,   y: -65 },
+      { x: 95,  y: 5 },
+      { x: -95, y: 5 },
+      { x: 0,   y: 65 },
+      { x: 80,  y: -55 },
+      { x: -80, y: -55 },
+      { x: 90,  y: 35 },
+      { x: -90, y: 35 },
+      { x: 25,  y: -65 },
+      { x: -25, y: -65 },
+      { x: 85,  y: -20 },
+      { x: -85, y: -20 },
+      { x: 30,  y: 65 },
+      { x: -30, y: 65 },
+      { x: 80,  y: 50 },
+      { x: -80, y: 50 },
+      { x: 95,  y: -30 },
+      { x: -95, y: -30 },
+      { x: 70,  y: -60 },
+      { x: -70, y: -60 },
+      { x: 75,  y: 60 }
+    ];
+
+    // Step 2: 每次點「不要」時，「要」按鈕等比變大，「不要」按鈕逃跑縮小並輪播挽回情話
+    function runAway() {
+      state.noClicks += 1;
+
+      state.yesScale = Math.min(1.85, 1 + state.noClicks * 0.045);
+      elements.yesButton.style.transform = `scale(${state.yesScale})`;
+
+      state.noScale = Math.max(0.55, 1 - state.noClicks * 0.02);
+      const wobble = (state.noClicks % 2 === 0 ? 1 : -1) * 6;
+      elements.noButton.style.transform = `scale(${state.noScale}) rotate(${wobble}deg)`;
+
+      if (!elements.noColumn.classList.contains("runaway")) {
+        const zoneRect = elements.yesNoZone.getBoundingClientRect();
+        const colRect = elements.noColumn.getBoundingClientRect();
+        const startX = (colRect.left + colRect.width / 2) - (zoneRect.left + zoneRect.width / 2);
+        const startY = (colRect.top + colRect.height / 2) - (zoneRect.top + zoneRect.height / 2);
+
+        elements.noColumn.classList.add("runaway");
+        elements.noColumn.style.transform = `translate(-50%, -50%) translate(${startX}px, ${startY}px)`;
+        void elements.noColumn.offsetWidth;
+      }
+
+      const target = runawayPositions[(state.noClicks - 1) % runawayPositions.length];
+      elements.noColumn.style.transform = `translate(-50%, -50%) translate(${target.x}px, ${target.y}px)`;
+
+      const lineIndex = (state.noClicks - 1) % CONFIG.PERSUASION_LINES.length;
+      elements.persuasion.textContent = CONFIG.PERSUASION_LINES[lineIndex];
+      elements.persuasion.classList.add("visible");
+
+      const btnRect = elements.noButton.getBoundingClientRect();
+      throwTinyHearts({ x: btnRect.left + btnRect.width / 2, y: btnRect.top + 10 });
+    }
+
+    elements.noButton.addEventListener("click", runAway);
+    elements.yesButton.addEventListener("click", event => {
+      const rect = event.currentTarget.getBoundingClientRect();
+      throwTinyHearts({ x: rect.left + rect.width / 2, y: rect.top + 10 });
+      celebrate(34);
+      elements.noColumn.style.display = "none";
+      window.setTimeout(() => showStep("proposal"), 750);
+    });
+
+    // Step Proposal: 11/1 見面約定（時間由她訂，可以 vs 不可以）
+    if (elements.proposalYesBtn) {
+      elements.proposalYesBtn.addEventListener("click", event => {
+        state.date = "2026-11-01";
+        const chosenTime = elements.proposalTimeInput && elements.proposalTimeInput.value ? elements.proposalTimeInput.value : "18:30";
+        state.time = chosenTime;
+        elements.dateInput.value = "2026-11-01";
+        elements.timeInput.value = chosenTime;
+        updateDatePreview();
+        const rect = event.currentTarget.getBoundingClientRect();
+        throwTinyHearts({ x: rect.left + rect.width / 2, y: rect.top + 10 });
+        celebrate(30);
+        window.setTimeout(() => showStep(4), 500);
+      });
+    }
+
+    if (elements.proposalTimeInput) {
+      elements.proposalTimeInput.addEventListener("input", e => {
+        state.time = e.target.value || "18:30";
+        if (elements.timeInput) elements.timeInput.value = state.time;
+      });
+    }
+
+    if (elements.proposalNoBtn) {
+      elements.proposalNoBtn.addEventListener("click", () => {
+        if (elements.proposalTimeInput && elements.timeInput) {
+          elements.timeInput.value = elements.proposalTimeInput.value;
+        }
+        showStep(3);
+      });
+    }
+
+    if (elements.backToProposalBtn) {
+      elements.backToProposalBtn.addEventListener("click", () => {
+        if (elements.proposalTimeInput && elements.timeInput) {
+          elements.proposalTimeInput.value = elements.timeInput.value;
+        }
+        showStep("proposal");
+      });
+    }
+
+    // Step 3: 日期選擇與預覽
+    function updateDatePreview() {
+      const date = elements.dateInput.value;
+      const time = elements.timeInput.value;
+      if (!date || !time) { elements.datePreview.classList.remove("show"); return; }
+      elements.datePreviewText.textContent = `那就 ${formatDate(date)} ${formatTime(time)} 見，好期待。`;
+      elements.datePreview.classList.add("show");
+    }
+    elements.dateInput.addEventListener("input", updateDatePreview);
+    elements.timeInput.addEventListener("input", updateDatePreview);
+    $("#confirmDateButton").addEventListener("click", async () => {
+      const date = elements.dateInput.value;
+      const time = elements.timeInput.value;
+      if (!date) {
+        showMessage(elements.dateMessage, "請先選擇一個想見面的日期唷～");
+        return;
+      }
+      if (date < elements.dateInput.min) {
+        showMessage(elements.dateMessage, "只能選擇 11 月 1 日之後的時間唷，因為那時候我才回國了。");
+        return;
+      }
+      hideMessage(elements.dateMessage);
+      state.date = date;
+      state.time = time || "18:30";
+      showStep(4);
+    });
+
+    // Step 4: 約會守則 (5 條必須全選)
+    $$(".rule-card").forEach(card => {
+      const input = card.querySelector("input");
+      card.addEventListener("click", () => {
+        input.checked = !input.checked;
+        card.classList.toggle("checked", input.checked);
+        state.rules[input.dataset.rule] = input.checked;
+        if (Object.values(state.rules).every(Boolean)) {
+          hideMessage(elements.rulesMessage);
+        }
+      });
+    });
+    $("#rulesButton").addEventListener("click", () => {
+      const allDone = Object.values(state.rules).every(Boolean);
+      if (!allDone) {
+        showMessage(elements.rulesMessage, "還有約定沒有打勾勾喔！要全部答應才能進入下一步 🥺");
+        $$(".rule-card").forEach(card => {
+          if (!card.querySelector("input").checked) {
+            card.classList.add("shake");
+            window.setTimeout(() => card.classList.remove("shake"), 400);
+          }
+        });
+        return;
+      }
+      hideMessage(elements.rulesMessage);
+      showStep(5);
+    });
+
+    // Step 5: 心願清單
+    $$("#activityGrid .choice-card").forEach(card => {
+      if (card.id === "otherCard") return;
+      card.addEventListener("click", () => {
+        const key = card.dataset.activity;
+        if (state.activities.has(key)) {
+          state.activities.delete(key);
+          card.classList.remove("selected");
+          card.setAttribute("aria-pressed", "false");
+        } else {
+          state.activities.add(key);
+          card.classList.add("selected");
+          card.setAttribute("aria-pressed", "true");
+        }
+        if (state.activities.size > 0) hideMessage(elements.activitiesMessage);
+      });
+    });
+    elements.otherCard.addEventListener("click", event => {
+      if (event.target === elements.otherInput) return;
+      elements.otherInput.focus();
+    });
+    elements.otherInput.addEventListener("input", event => {
+      const text = event.target.value.trim();
+      state.otherText = text;
+      if (text.length > 0) {
+        state.activities.add("other");
+        elements.otherCard.classList.add("selected");
+        elements.otherCard.setAttribute("aria-pressed", "true");
+        hideMessage(elements.activitiesMessage);
+      } else {
+        state.activities.delete("other");
+        elements.otherCard.classList.remove("selected");
+        elements.otherCard.setAttribute("aria-pressed", "false");
+      }
+    });
+    $("#activitiesButton").addEventListener("click", () => {
+      if (state.activities.size === 0) {
+        showMessage(elements.activitiesMessage, "至少選一個妳想做的事情嘛～");
+        return;
+      }
+      hideMessage(elements.activitiesMessage);
+      buildDetailFields();
+      showStep(6);
+    });
+
+    // Step 6: 動態手帳細節填寫
+    function buildDetailFields() {
+      const activities = Array.from(state.activities);
+      elements.detailFields.innerHTML = activities.map(key => {
+        const item = activityInfo[key];
+        const previous = state.details[key] || "";
+        const otherHint = key === "other" && state.otherText
+          ? `<p class="answered-other">妳剛剛寫的心願：${escapeHTML(state.otherText)}</p>` : "";
+        const control = key === "other"
+          ? `<textarea class="detail-input" data-detail="${key}" maxlength="300" placeholder="${escapeHTML(item.placeholder)}">${escapeHTML(previous)}</textarea>`
+          : `<input class="detail-input" data-detail="${key}" type="text" maxlength="180" value="${escapeHTML(previous)}" placeholder="${escapeHTML(item.placeholder)}" />`;
+        return `<div class="detail-block">${otherHint}<label for="detail-${key}"><span>${item.icon}</span><span>${escapeHTML(item.label)}</span></label>${control}</div>`;
+      }).join("");
+      $$(".detail-input", elements.detailFields).forEach(input => input.addEventListener("input", () => {
+        state.details[input.dataset.detail] = input.value.trim();
+        updatePlanPeek();
+      }));
+      updatePlanPeek();
+    }
+    function updatePlanPeek() {
+      elements.planPeek.textContent = `${formatDate(state.date)} ${formatTime(state.time)} · ${selectedActivityNames()}`;
+    }
+    $("#submitPlanButton").addEventListener("click", () => {
+      $$(".detail-input", elements.detailFields).forEach(input => { state.details[input.dataset.detail] = input.value.trim(); });
+      const summary = getPlanText(true);
+      elements.modalSummary.textContent = summary;
+      elements.summaryModal.classList.add("show");
+      elements.summaryModal.setAttribute("aria-hidden", "false");
+      $("#modalConfirm").focus();
+    });
+    $("#modalCancel").addEventListener("click", closeModal);
+    elements.summaryModal.addEventListener("click", event => { if (event.target === elements.summaryModal) closeModal(); });
+    document.addEventListener("keydown", event => { if (event.key === "Escape") closeModal(); });
+    function closeModal() {
+      elements.summaryModal.classList.remove("show");
+      elements.summaryModal.setAttribute("aria-hidden", "true");
+    }
+
+    // Step 6 按下確認送出：信紙折疊成紙飛機並往右滑翔起飛，背景非同步發送 Webhook，隨後進入 Step 7 密語關卡
+    $("#modalConfirm").addEventListener("click", () => {
+      closeModal();
+      
+      // 啟動浪漫手折紙飛機全螢幕動畫
+      if (elements.planeOverlay) {
+        elements.planeOverlay.classList.add("launching");
+      }
+      
+      // 背景非同步發送約會計畫至 Webhook（不阻礙動畫流暢度）
+      sendPlan("final_plan").then(() => renderFinal());
+      throwTinyHearts({ x: window.innerWidth / 2, y: window.innerHeight / 2 });
+
+      // 待信箋細緻折疊並悠然往右滑翔飛出畫面（約 4.55 秒後），無縫轉場至 Step 7
+      window.setTimeout(() => {
+        if (elements.planeOverlay) {
+          elements.planeOverlay.classList.remove("launching");
+        }
+        showStep(7);
+      }, 4550);
+    });
+
+    // Step 7: 最後你想跟我說什麼 (輸入包含「喜歡你」或「喜歡妳」或「我喜歡你」即可通過)
+    function handleSecretPass() {
+      const input = elements.secretInput;
+      const msg = elements.secretMsg;
+      const raw = (input.value || "").trim();
+      const cleaned = raw.replace(/\s+/g, "");
+
+      // 檢查是否包含「喜歡你」或「喜歡妳」（例如：「我覺得過完這幾天 我應該還是有喜歡你」）
+      const hasLove = /喜歡[你妳]/.test(cleaned);
+
+      if (hasLove) {
+        hideMessage(msg);
+        state.secretMessage = raw;
+
+        // 背景非同步發送包含她真心話的完整約會計畫至 Webhook（完全隱密發送至 Gmail，畫面不顯示任何已寄出提示）
+        sendPlan("final_plan_with_secret");
+
+        // 通過！跳轉至 Step 8 終極大結局，並啟動 Tkinter 彈窗愛心與滿版風暴
+        showStep(8);
+      } else {
+        // 未提到喜歡你：跳出提示「你喜歡誰?」與震動反饋
+        showMessage(msg, "你喜歡誰?");
+        if (elements.secretWrap) {
+          elements.secretWrap.classList.add("shake");
+          window.setTimeout(() => elements.secretWrap.classList.remove("shake"), 400);
+        }
+        input.focus();
+      }
+    }
+    elements.secretSubmitBtn.addEventListener("click", handleSecretPass);
+    elements.secretInput.addEventListener("keydown", event => {
+      if (event.key === "Enter") handleSecretPass();
+    });
+
+    // ════════════════════════════════════════════════════════════════
+    // 💖 Step 8 Tkinter 風格彈窗愛心 ➔ 直接消失 ➔ 滿版風暴動畫引擎
+    // ════════════════════════════════════════════════════════════════
+    const tkPhrases = [
+      "天天開心",
+      "天冷了記得多穿一點",
+      "別感冒了",
+      "記得吃早餐",
+      "早點睡覺",
+      "別熬夜了",
+      "多喝溫水",
+      "今天辛苦了",
+      "累了就休息",
+      "有我在呢",
+      "我想妳了",
+      "要好好吃飯",
+      "保持好心情",
+      "平平安安",
+      "抱抱妳",
+      "多喝水喔~",
+      "別給自己太大壓力",
+      "慢慢來不急",
+      "順順利利",
+      "笑一個嘛",
+      "路上小心",
+      "聽喜歡的歌",
+      "明天見",
+      "要幸福喔",
+      "記得戴圍巾",
+      "吃點甜的",
+      "妳很棒",
+      "做妳想做的事",
+      "最喜歡妳了",
+      "平安健康",
+      "記得穿暖暖",
+      "今天也很想妳",
+      "好好愛自己",
+      "心情要好好的",
+      "一切都會很好的"
+    ];
+    const tkColors = ["bg-pink", "bg-blue", "bg-green", "bg-yellow", "bg-purple", "bg-cyan", "bg-rose"];
+
+    // 生成單個 Tkinter 視窗元素
+    function createTkWindow(x, y, text, colorClass) {
+      const win = document.createElement("div");
+      win.className = "tk-win";
+      win.style.left = `${x}px`;
+      win.style.top = `${y}px`;
+
+      win.innerHTML = `
+        <div class="tk-titlebar">
+          <div class="tk-title-left">
+            <span class="tk-icon"></span>
+            <span>提示</span>
+          </div>
+          <div class="tk-title-btns">
+            <span>─</span>
+            <span>□</span>
+            <span class="tk-btn-close">✕</span>
+          </div>
+        </div>
+        <div class="tk-body ${colorClass}">
+          ${escapeHTML(text)}
+        </div>
+      `;
+
+      const closeBtn = win.querySelector(".tk-btn-close");
+      if (closeBtn) {
+        closeBtn.addEventListener("click", e => {
+          e.stopPropagation();
+          win.remove();
+        });
+      }
+      return win;
+    }
+
+    // 取得心形座標點 (密集排列、抬升頂部凹槽，並讓中央「我也喜歡你」徹底不被遮擋)
+    function getHeartCoordinates(count, radiusX, radiusY, centerX, heartCenterY) {
+      const coords = [];
+      for (let i = 0; i < count; i++) {
+        const t = (i / count) * 2 * Math.PI;
+        const x = 16 * Math.pow(Math.sin(t), 3);
+        let y = -(13 * Math.cos(t) - 5 * Math.cos(2 * t) - 2 * Math.cos(3 * t) - Math.cos(4 * t));
+
+        // 頂部凹槽微調抬升，保持圓潤心形外觀同時徹底避開上方文字
+        if (Math.cos(t) > 0.4) {
+          const distFromNotch = Math.abs(Math.sin(t));
+          y -= 3.8 * Math.max(0, 1.0 - distFromNotch);
+        }
+
+        coords.push({
+          x: centerX + (x / 16) * radiusX,
+          y: heartCenterY + (y / 16) * radiusY
+        });
+      }
+      return coords;
+    }
+
+    function runTkinterLoveShow() {
+      const stage = document.getElementById("popupStage");
+      const hero = document.getElementById("centerHero");
+      if (!stage) return;
+      stage.innerHTML = "";
+      if (hero) hero.classList.remove("hidden");
+
+      const winW = window.innerWidth;
+      const winH = window.innerHeight;
+      const centerX = winW / 2;
+      const centerY = winH / 2;
+
+      const isMobile = winW < 600;
+      const cardW = isMobile ? 102 : 116;
+      const cardH = isMobile ? 40 : 44;
+
+      // 文字位置微幅上移，確保上方有充分展示空間
+      const textCenterY = centerY - (isMobile ? 36 : 44);
+
+      // 愛心半徑擴大且飽滿
+      const radiusX = isMobile ? Math.min(winW * 0.46, 210) : Math.min(winW * 0.44, 320);
+      const radiusY = radiusX * (isMobile ? 1.05 : 1.02);
+      // 心形中心與文字完美協調，四周留出極大安全距離
+      const heartCenterY = textCenterY + (isMobile ? 12 : 18);
+
+      // 卡片數量大幅增加，排成無縫緊密、互相微重疊的飽滿大愛心（完全沒有空隙）
+      const heartCount = isMobile ? 62 : 76;
+      const heartCoords = getHeartCoordinates(heartCount, radiusX, radiusY, centerX, heartCenterY);
+      const heartWindows = [];
+
+      // 階段一：節奏調快（每 55ms 彈出一張），流暢俐落地快速排滿密集無縫愛心（約 3.4~4.2 秒）
+      const cardInterval = 55;
+      heartCoords.forEach((pt, i) => {
+        window.setTimeout(() => {
+          const text = tkPhrases[i % tkPhrases.length];
+          const color = tkColors[i % tkColors.length];
+          const posX = Math.round(pt.x - cardW / 2);
+          const posY = Math.round(pt.y - cardH / 2);
+
+          const win = createTkWindow(posX, posY, text, color);
+          stage.appendChild(win);
+          heartWindows.push(win);
+        }, 150 + i * cardInterval);
+      });
+
+      // 愛心完全排完的時間點
+      const heartFinishedTime = 150 + heartCount * cardInterval;
+      // 階段二：在愛心排完之後，停留 1.5 秒欣賞這顆密集無縫的大愛心
+      const heartPauseDuration = 1500;
+      const heartDrawnTime = heartFinishedTime + heartPauseDuration;
+
+      // 階段三：愛心停留 1.5 秒後「直接全部消失」，中央「我也喜歡你」也一起消失！
+      window.setTimeout(() => {
+        // 1. 直接移除所有愛心視窗
+        heartWindows.forEach(w => w.remove());
+        stage.innerHTML = "";
+        // 2. 「我也喜歡你」一起消失
+        if (hero) hero.classList.add("hidden");
+
+        // 階段四：立即開始全螢幕狂跳訊息視窗，一次彈很多個，急速滿版暴擊！
+        startFullScreenStorm(winW, winH, cardW, cardH, stage);
+      }, heartDrawnTime);
+    }
+
+    // 階段四：滿版彈窗風暴（一次跳 5 個在不同位置，約 5 秒全部跳完，速度飛快）
+    function startFullScreenStorm(winW, winH, cardW, cardH, stage) {
+      if (!stage) stage = document.getElementById("popupStage");
+      if (!stage) return;
+
+      // 總數量 400 個，每次 5 個在不同方位，總共 80 波
+      const totalPopups = 400;
+      const batchSize = 5; // 一次跳 5 個在不同位置
+      // 5 秒全部跳完：5000ms / 80波 = 62.5ms 一波
+      const burstInterval = 62.5;
+
+      // 5 個不同區域劃分，確保同一波的 5 張便利貼分布在螢幕不同方位（左上、右上、中央、左下、右下）
+      const zones = [
+        { xMin: 0.02, xMax: 0.44, yMin: 0.02, yMax: 0.42 }, // 左上區
+        { xMin: 0.52, xMax: 0.94, yMin: 0.02, yMax: 0.42 }, // 右上區
+        { xMin: 0.22, xMax: 0.74, yMin: 0.28, yMax: 0.68 }, // 中央區
+        { xMin: 0.02, xMax: 0.44, yMin: 0.54, yMax: 0.94 }, // 左下區
+        { xMin: 0.52, xMax: 0.94, yMin: 0.54, yMax: 0.94 }  // 右下區
+      ];
+
+      const maxSpawnX = Math.max(10, winW - cardW);
+      const maxSpawnY = Math.max(10, winH - cardH);
+
+      let spawned = 0;
+      let wave = 0;
+
+      while (spawned < totalPopups) {
+        const currentBatch = Math.min(batchSize, totalPopups - spawned);
+        const delay = Math.round(wave * burstInterval);
+
+        for (let b = 0; b < currentBatch; b++) {
+          const popupIndex = spawned + b;
+          const zone = zones[b % zones.length];
+
+          window.setTimeout(() => {
+            const text = tkPhrases[Math.floor(Math.random() * tkPhrases.length)];
+            const color = tkColors[Math.floor(Math.random() * tkColors.length)];
+
+            // 在各自指定方位區域內隨機落點，保證每波 5 個各奔不同位置
+            const posX = Math.round((zone.xMin + Math.random() * (zone.xMax - zone.xMin)) * maxSpawnX);
+            const posY = Math.round((zone.yMin + Math.random() * (zone.yMax - zone.yMin)) * maxSpawnY);
+
+            const win = createTkWindow(posX, posY, text, color);
+            win.style.zIndex = 20 + popupIndex;
+            stage.appendChild(win);
+          }, delay + Math.round(Math.random() * 8));
+        }
+
+        spawned += currentBatch;
+        wave++;
+      }
+    }
+
+    function getPlanObject(eventType) {
+      return {
+        event: eventType,
+        submittedAt: new Date().toISOString(),
+        date: state.date,
+        formattedDate: formatDate(state.date),
+        time: state.time,
+        activities: Array.from(state.activities).map(key => ({ key, name: activityInfo[key]?.name, detail: state.details[key] || "" })),
+        otherWish: state.otherText,
+        promisesAccepted: Object.values(state.rules).every(Boolean),
+        secretMessage: state.secretMessage || "",
+        finalWords: state.secretMessage || "",
+        herWords: state.secretMessage || "",
+        planSummary: getPlanText(true),
+        source: "sweet-apology-date-single-file-spa"
+      };
+    }
+    function getPlanText(includeDetails = false) {
+      let header = `💌 我們的約會計畫\n時間：${formatDate(state.date)} ${formatTime(state.time)}\n想做的事：${selectedActivityNames()}`;
+      if (state.secretMessage) {
+        header += `\n\n💭 她最後留給你的真心話：\n「${state.secretMessage}」`;
+      }
+      if (!includeDetails) return header;
+      const details = Array.from(state.activities).map(key => {
+        const text = state.details[key] || (key === "other" ? state.otherText : "（細節到時候一起決定）");
+        return `${activityInfo[key]?.icon || "•"} ${activityInfo[key]?.name || key}：${text}`;
+      }).join("\n");
+      return `${header}\n\n小細節：\n${details}\n\n我們答應：見面不能擺臭臉、不生氣直接說、不要不耐煩。`;
+    }
+
+    // Webhook 發送至 Google Apps Script Web App
+    async function sendPlan(eventType) {
+      const payload = getPlanObject(eventType);
+      if (!CONFIG.WEBHOOK_URL) { state.lastDelivery = "local"; return { ok: true, mode: "local", payload }; }
+      try {
+        const isAppsScript = CONFIG.WEBHOOK_MODE === "apps-script";
+        const response = await fetch(CONFIG.WEBHOOK_URL, {
+          method: CONFIG.WEBHOOK_METHOD || "POST",
+          mode: isAppsScript ? "no-cors" : "cors",
+          headers: isAppsScript
+            ? { "Content-Type": "text/plain;charset=utf-8" }
+            : { "Content-Type": "application/json", "Accept": "application/json" },
+          body: JSON.stringify(payload)
+        });
+        if (!isAppsScript && !response.ok) throw new Error(`Webhook status ${response.status}`);
+        state.lastDelivery = "webhook";
+        return { ok: true, mode: "webhook", payload };
+      } catch (error) {
+        console.warn("約會資料回傳失敗，已保留在本機狀態：", error);
+        state.lastDelivery = "failed";
+        return { ok: false, mode: "failed", payload, error };
+      }
+    }
+
+    function renderFinal() {
+      const finalText = getPlanText(true);
+      elements.finalSummaryText.textContent = `${formatDate(state.date)} ${formatTime(state.time)}\n${selectedActivityNames()}`;
+      const lineText = encodeURIComponent(finalText);
+      elements.lineShareButton.href = `https://line.me/R/msg/text/?${lineText}`;
+      if (state.lastDelivery === "webhook") elements.deliveryNote.textContent = "約會計畫已成功發送至你的專屬 Gmail，也可以用 LINE 再分享一次。";
+      if (state.lastDelivery === "failed") elements.deliveryNote.textContent = "設定的 Webhook 暫時沒有回應，但這份計畫仍顯示在這裡，可以用 LINE 分享。";
+      if (state.lastDelivery === "local") elements.deliveryNote.textContent = "本頁沒有設定資料回傳網址，因此資料只保留在這次瀏覽中；可使用 LINE 分享把計畫傳出去。";
+    }
+    $("#copyButton").addEventListener("click", async () => {
+      const button = $("#copyButton");
+      const original = button.textContent;
+      try {
+        await navigator.clipboard.writeText(getPlanText(true));
+        button.textContent = "已複製 ♥";
+      } catch {
+        const area = document.createElement("textarea");
+        area.value = getPlanText(true);
+        document.body.appendChild(area);
+        area.select();
+        document.execCommand("copy");
+        area.remove();
+        button.textContent = "已複製 ♥";
+      }
+      window.setTimeout(() => { button.textContent = original; }, 1600);
+    });
+
+    // 啟動初始化
+    window.apologyDateApp = { state, CONFIG, getPlanObject, getPlanText, showStep, toggleMusic };
+    document.body.setAttribute("data-step", "cover");
+    updateProgress();
+    tryAutoplayOnLoad();
+
+
+  </script>
+
+  <!-- 瀏覽器攔截自動播放時的溫馨輕觸提示 -->
+  <div id="audioHintPill" class="audio-hint-pill" aria-hidden="true">
+    <span>🎵 輕觸畫面任一處開啟音樂</span>
+  </div>
+</body>
+</html>
