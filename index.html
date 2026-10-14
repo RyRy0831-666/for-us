@@ -1662,40 +1662,6 @@
     }
 
 
-    .audio-hint-pill {
-      position: fixed;
-      bottom: 24px;
-      left: 50%;
-      transform: translateX(-50%) translateY(20px);
-      background: rgba(85, 54, 47, 0.92);
-      color: #fff;
-      font-size: 12px;
-      font-weight: 600;
-      padding: 8px 18px;
-      border-radius: 999px;
-      box-shadow: 0 8px 26px rgba(142, 75, 82, 0.28);
-      backdrop-filter: blur(8px);
-      -webkit-backdrop-filter: blur(8px);
-      opacity: 0;
-      pointer-events: none;
-      transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
-      z-index: 9999;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      border: 1px solid rgba(255, 255, 255, 0.2);
-    }
-    .audio-hint-pill.show {
-      opacity: 1;
-      transform: translateX(-50%) translateY(0);
-      pointer-events: auto;
-      animation: pillPulse 2s ease-in-out infinite;
-    }
-    @keyframes pillPulse {
-      0%, 100% { transform: translateX(-50%) translateY(0) scale(1); }
-      50% { transform: translateX(-50%) translateY(0) scale(1.04); }
-    }
 
     /* 序章：專屬開場信件頁面 */
     .cover-page {
@@ -2421,10 +2387,6 @@
 
     function updateMusicToggleUI() {
       const btn = elements.musicToggle;
-      const pill = document.getElementById("audioHintPill");
-      if (bgmState.isPlaying && pill) {
-        pill.classList.remove("show");
-      }
       if (!btn) return;
       if (bgmState.isPlaying) {
         btn.classList.add("playing");
@@ -2554,17 +2516,11 @@
       fadePlay(initialTrack).then(() => {
         bgmState.userUnlocked = true;
       }).catch(err => {
-        console.log("瀏覽器攔截無互動自動播放，提示輕觸解鎖：", err);
-        const pill = document.getElementById("audioHintPill");
-        if (pill && !bgmState.isPlaying) {
-          pill.classList.add("show");
-        }
+        console.log("瀏覽器等待首次使用者互動以播放音訊：", err);
       });
     }
 
     function unlockAudioOnFirstTouch() {
-      const pill = document.getElementById("audioHintPill");
-      if (pill) pill.classList.remove("show");
       if (!bgmState.userUnlocked) {
         bgmState.userUnlocked = true;
         const initialTrack = getEffectiveTrackForStep(state.step);
@@ -3338,9 +3294,6 @@
 
   </script>
 
-  <!-- 瀏覽器攔截自動播放時的溫馨輕觸提示 -->
-  <div id="audioHintPill" class="audio-hint-pill" aria-hidden="true">
-    <span>🎵 輕觸畫面任一處開啟音樂</span>
-  </div>
+
 </body>
 </html>
