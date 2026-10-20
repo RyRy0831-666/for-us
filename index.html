@@ -5,9 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, viewport-fit=cover" />
   <meta name="theme-color" content="#fff8f1" />
   <title>和好吧｜專屬約會邀約</title>
-  <!-- 提前預先載入大結局音樂，保證最後一頁零延遲同步爆發 -->
-  <link rel="preload" href="./music4.mp3" as="fetch" type="audio/mpeg" crossorigin />
-  <link rel="preload" href="./music1.mp3" as="fetch" type="audio/mpeg" crossorigin />
   <style>
     /*
       ╭──────────────────────────────────────────────────────────╮
@@ -2364,109 +2361,74 @@
     };
 
     // ════════════════════════════════════════════════════════════════════
-    // 🎵 背景音樂管理器 (保證全曲循環播放、相同音樂跨頁無縫連播不中斷)
+    // 🎵 背景音樂管理器：四大音樂分區，每個分區一個專屬播放器
+    // Zone 1：開場信件 ➔ 第一章 (step0)              → music1.mp3（打開信件時播放）
+    // Zone 2：第二章 (step1)                          → music2.mp3（平滑淡入）
+    // Zone 3：第三章 ~ 最後真心話 (step2~7、proposal) → music3.mp3（一曲到底，換頁絕不重播）
+    // Zone 4：大結局 (step8)                          → music4.mp3（送出瞬間滿音量直下）
     // ════════════════════════════════════════════════════════════════════
-    const bgmPlayer = new Audio();
-    bgmPlayer.loop = true;
-    bgmPlayer.preload = "auto";
-    bgmPlayer.addEventListener("ended", () => {
-      // 雙重循環保險：確保所有瀏覽器結束時皆自動循環從頭播放
-      bgmPlayer.currentTime = 0;
-      bgmPlayer.play().catch(() => {});
+    const ZONE_TRACKS = {
+      1: CONFIG.BGM.step0 || "./music1.mp3",
+      2: CONFIG.BGM.step1 || "./music2.mp3",
+      3: CONFIG.BGM.step2 || "./music3.mp3",
+      4: CONFIG.BGM.step8 || "./music4.mp3"
+    };
+    const BGM_VOLUME = 0.85;
+
+    const zonePlayers = {};
+    [1, 2, 3, 4].forEach(zone => {
+      const player = new Audio();
+      player.loop = true;
+      player.preload = "auto";
+      player.volume = BGM_VOLUME;
+      player.dataset.zone = String(zone);
+      let triedFallback = false;
+      player.addEventListener("error", () => {
+        // 如果 .mp3 載入失敗，自動改用備份的 .mp3.mp4
+        const src = ZONE_TRACKS[zone];
+        if (!triedFallback && src.endsWith(".mp3")) {
+          triedFallback = true;
+          player.src = src + ".mp4";
+          player.load();
+          if (zone === currentMusicZone && musicEnabled) player.play().catch(() => {});
+        }
+      });
+      player.addEventListener("ended", () => {
+        // 雙重循環保險
+        player.currentTime = 0;
+        player.play().catch(() => {});
+      });
+      player.src = ZONE_TRACKS[zone];
+      zonePlayers[zone] = player;
     });
 
-    // 💖 大結局專屬獨立播放器 (Step 8 專用，預快取記憶體音軌，保證點擊瞬間 0 延遲同步暴擊)
-    const climaxPlayer = new Audio();
-    climaxPlayer.loop = true;
-    climaxPlayer.preload = "auto";
-    climaxPlayer.volume = 0.85;
-    climaxPlayer.src = CONFIG.BGM.step8 || "./music4.mp3";
-    climaxPlayer.addEventListener("ended", () => {
-      climaxPlayer.currentTime = 0;
-      climaxPlayer.play().catch(() => {});
-    });
-
-    let activePlayer = bgmPlayer;
+    const bgmPlayer = zonePlayers[1];
+    const climaxPlayer = zonePlayers[4];
 
     const bgmState = {
       isPlaying: false,
-      currentTrack: "",
       userUnlocked: false
     };
+    let currentMusicZone = 0;   // 目前正在播放的分區（0 = 尚未開始）
+    let musicEnabled = true;    // 使用者是否用右上角按鈕關掉音樂
+    let fadeTimer = null;
 
-    // ⚡ 全曲音訊 Blob 記憶體預快取池 (將音訊預先載入手機 RAM，切換時零等待)
-    const audioBlobCache = {};
-
-    function preloadAudioTrack(url) {
-      if (!url || audioBlobCache[url]) return;
-      fetch(url)
-        .then(res => {
-          if (!res.ok) throw new Error("Audio HTTP " + res.status);
-          return res.blob();
-        })
-        .then(blob => {
-          const blobUrl = URL.createObjectURL(blob);
-          audioBlobCache[url] = blobUrl;
-          if (url.includes("music4.mp3") || url === CONFIG.BGM.step8) {
-            climaxPlayer.src = blobUrl;
-            climaxPlayer.load();
-          }
-        })
-        .catch(err => {
-          // 若為本機 file 協定或離線狀態，退回正常直連
-          if (url.includes("music4.mp3") || url === CONFIG.BGM.step8) {
-            if (!climaxPlayer.src) {
-              climaxPlayer.src = url;
-              climaxPlayer.load();
-            }
-          }
-        });
-    }
-
-    function initAudioPreloader() {
-      const tracks = [
-        CONFIG.BGM.step8 || "./music4.mp3",
-        CONFIG.BGM.step2 || "./music3.mp3",
-        CONFIG.BGM.step1 || "./music2.mp3",
-        CONFIG.BGM.step0 || "./music1.mp3"
-      ];
-      tracks.forEach(preloadAudioTrack);
-    }
-
-    // ════════════════════════════════════════════════════════════════════
-    // 🎵 四大專屬音樂分區（保證全站換頁絕不跳歌、中間頁面一曲到底絕對連貫）
-    // Zone 1：第一章 (step0) -> music1.mp3
-    // Zone 2：第二章 (step1) -> music2.mp3
-    // Zone 3：中間所有頁面 (step2 ~ step7，含 proposal 約會約定) -> music3.mp3 (一曲到底不中斷)
-    // Zone 4：大結局 (step8 我也喜歡你) -> music4.mp3 (獨立音軌秒開爆發)
-    // ════════════════════════════════════════════════════════════════════
     function getMusicZone(stepIndex) {
       if (stepIndex === "cover" || stepIndex === 0 || stepIndex === "0") return 1;
       if (stepIndex === 1 || stepIndex === "1") return 2;
       if (stepIndex === 8 || stepIndex === "8") return 4;
-      // 所有中間頁面：2, "proposal", 3, 4, 5, 6, 7 全部鎖定為 Zone 3！
-      return 3;
+      return 3; // 2、proposal、3、4、5、6、7 全部屬於 Zone 3
     }
 
-    let currentMusicZone = 0;
-
-    function isSameTrack(trackA, trackB) {
-      if (!trackA || !trackB) return false;
-      if (trackA === trackB) return true;
-      const clean = s => decodeURIComponent(String(s))
-        .split(/[?#]/)[0]
-        .split("/").pop()
-        .toLowerCase()
-        .replace(/\.mp4$/, "");
-      return clean(trackA) === clean(trackB);
+    // 保留舊函式名稱（相容用）
+    function getEffectiveTrackForStep(stepIndex) {
+      return ZONE_TRACKS[getMusicZone(stepIndex)];
     }
 
     function updateMusicToggleUI() {
       const btn = elements.musicToggle;
       if (!btn) return;
-      const player = (state.step === 8) ? climaxPlayer : (activePlayer || bgmPlayer);
-      const isActuallyPlaying = bgmState.isPlaying && player && !player.paused;
-      if (isActuallyPlaying || bgmState.isPlaying) {
+      if (bgmState.isPlaying && musicEnabled) {
         btn.classList.add("playing");
         btn.classList.remove("paused");
         btn.title = "點擊暫停背景音樂";
@@ -2477,203 +2439,141 @@
       }
     }
 
-    let bgmFadeToken = 0;
-
-    async function fadePlay(src) {
-      if (!src) return;
-      // 若已經在播放同一首歌曲，絕對不重新載入或重設進度，保持無縫連貫播放！
-      if (isSameTrack(src, bgmState.currentTrack)) {
-        if (bgmPlayer.paused && bgmState.userUnlocked) {
-          bgmPlayer.play().then(() => {
-            bgmState.isPlaying = true;
-            updateMusicToggleUI();
-          }).catch(() => {});
-        }
-        return;
-      }
-
-      const currentToken = ++bgmFadeToken;
-
-      try {
-        if (!bgmPlayer.paused && bgmPlayer.src) {
-          // 平滑淡出上一首
-          let vol = bgmPlayer.volume;
-          while (vol > 0.08) {
-            if (bgmFadeToken !== currentToken) return;
-            vol -= 0.15;
-            bgmPlayer.volume = Math.max(0, vol);
-            await new Promise(r => setTimeout(r, 50));
-          }
-        }
-        if (bgmFadeToken !== currentToken) return;
-        bgmPlayer.pause();
-        bgmPlayer.src = audioBlobCache[src] || src;
-        bgmPlayer.currentTime = 0;
-        bgmPlayer.volume = 0;
-        bgmPlayer.loop = true;
-        bgmState.currentTrack = src;
-
-        const playPromise = bgmPlayer.play();
-        if (playPromise !== undefined) {
-          bgmState.isPlaying = true;
-          updateMusicToggleUI();
-          await playPromise;
-          if (bgmFadeToken !== currentToken) return;
-          // 平滑淡入新曲
-          let vol = 0;
-          while (vol < 0.85) {
-            if (bgmFadeToken !== currentToken) return;
-            vol += 0.12;
-            bgmPlayer.volume = Math.min(0.85, vol);
-            await new Promise(r => setTimeout(r, 50));
-          }
-        }
-      } catch (err) {
-        console.log("音訊播放等待首次互動或檔案載入：", err);
-        // 如果 .mp3 載入失敗，嘗試備份 .mp3.mp4
-        if (src.endsWith(".mp3") && !src.endsWith(".mp3.mp4")) {
-          const fallbackSrc = src + ".mp4";
-          console.warn(`嘗試載入備用音訊格式：${fallbackSrc}`);
-          fadePlay(fallbackSrc);
-          return;
-        }
-        bgmState.isPlaying = false;
-        updateMusicToggleUI();
-      }
+    function fadeIn(player) {
+      window.clearInterval(fadeTimer);
+      let vol = 0;
+      player.volume = 0;
+      fadeTimer = window.setInterval(() => {
+        vol = Math.min(BGM_VOLUME, vol + 0.08);
+        player.volume = vol;
+        if (vol >= BGM_VOLUME) window.clearInterval(fadeTimer);
+      }, 60);
     }
 
-    // 計算當前步驟應播放的曲目（Step 2～Step 7 全部鎖定為第 3 首 music3.mp3，跨頁連貫不中斷）
-    function getEffectiveTrackForStep(stepIndex) {
-      if (stepIndex === "cover") {
-        return CONFIG.BGM.step0 || "./music1.mp3";
-      }
-      if (stepIndex === "proposal" || (stepIndex >= 2 && stepIndex <= 7)) {
-        return CONFIG.BGM.step2 || "./music3.mp3";
-      }
-      return CONFIG.BGM[`step${stepIndex}`] || CONFIG.BGM.step0 || "./music1.mp3";
-    }
+    // 切換到某個分區：停掉其他分區，播放這個分區
+    function playZone(zone) {
+      const next = zonePlayers[zone];
+      if (!next) return;
 
-    // 大結局專用切換：瞬間停掉舊歌，滿音量直下 music4，零淡入延遲
-    function playClimaxBgm() {
-      if (bgmPlayer && !bgmPlayer.paused) {
-        bgmPlayer.pause();
+      Object.keys(zonePlayers).forEach(key => {
+        const p = zonePlayers[key];
+        if (Number(key) !== zone && !p.paused) p.pause();
+      });
+      currentMusicZone = zone;
+
+      if (!musicEnabled) { updateMusicToggleUI(); return; }
+
+      window.clearInterval(fadeTimer);
+      next.muted = false;
+      if (zone === 4) {
+        // 大結局：從頭開始、滿音量直接下，不淡入
+        try { next.currentTime = 0; } catch (e) {}
+        next.volume = BGM_VOLUME;
       }
-      activePlayer = climaxPlayer;
-      bgmState.currentTrack = CONFIG.BGM.step8 || "./music4.mp3";
 
-      climaxPlayer.currentTime = 0;
-      climaxPlayer.volume = 0.85;
-
-      const playPromise = climaxPlayer.play();
-      if (playPromise !== undefined) {
+      const shouldFade = zone === 2 || zone === 3;
+      const playPromise = next.play();
+      bgmState.isPlaying = true;
+      updateMusicToggleUI();
+      if (playPromise && playPromise.then) {
         playPromise.then(() => {
-          bgmState.isPlaying = true;
-          updateMusicToggleUI();
+          if (shouldFade && currentMusicZone === zone) fadeIn(next);
         }).catch(err => {
-          console.warn("大結局音訊播放提示：", err);
+          console.warn("音樂播放被瀏覽器擋下，等待下一次點擊：", err);
           bgmState.isPlaying = false;
           updateMusicToggleUI();
         });
+      } else if (shouldFade) {
+        fadeIn(next);
       }
     }
 
+    // 換頁時呼叫：同一個分區內「完全不碰播放器」，保證 Zone 3 一曲到底
     function switchBgmForStep(stepIndex) {
       if (stepIndex === "cover") return;
-
-      const targetZone = getMusicZone(stepIndex);
-
-      // 【核心保證】：如果目標頁面與當前頁面屬於同一個音樂分區（特別是中間所有頁面 Zone 3），
-      // 絕對不做任何切歌動作！不暫停、不重設進度、不重新淡入淡出，保證一曲到底、完全連貫播放！
-      if (targetZone === currentMusicZone) {
-        // 若之前被意外暫停，且目前狀態仍應播放，則無縫續播（不重設時間）
-        if (activePlayer && activePlayer.paused && bgmState.userUnlocked && bgmState.isPlaying) {
-          activePlayer.play().catch(() => {});
+      const zone = getMusicZone(stepIndex);
+      if (zone === currentMusicZone) {
+        const p = zonePlayers[zone];
+        // 只有在意外被暫停時才續播（不重設秒數）
+        if (musicEnabled && bgmState.userUnlocked && p && p.paused) {
+          p.play().then(() => { bgmState.isPlaying = true; updateMusicToggleUI(); }).catch(() => {});
         }
         return;
       }
+      playZone(zone);
+    }
 
-      // 跨入不同分區，更新當前分區標記
-      currentMusicZone = targetZone;
-
-      if (targetZone === 4) {
-        // 進入大結局 Zone 4：啟動 climaxPlayer
-        playClimaxBgm();
-        return;
-      }
-
-      // 如果從大結局退回或切換，停下 climaxPlayer，切回 bgmPlayer
-      if (climaxPlayer && !climaxPlayer.paused) {
-        climaxPlayer.pause();
-      }
-      activePlayer = bgmPlayer;
-
-      let targetTrack = CONFIG.BGM.step0 || "./music1.mp3";
-      if (targetZone === 2) targetTrack = CONFIG.BGM.step1 || "./music2.mp3";
-      if (targetZone === 3) targetTrack = CONFIG.BGM.step2 || "./music3.mp3";
-
-      if (bgmState.userUnlocked) {
-        fadePlay(targetTrack);
-      }
+    // 相容舊呼叫：依照曲目找到分區播放
+    function fadePlay(src) {
+      const zone = Number(Object.keys(ZONE_TRACKS).find(z => ZONE_TRACKS[z] === src)) || getMusicZone(state.step);
+      playZone(zone);
+      return Promise.resolve();
     }
 
     function toggleMusic() {
-      const player = (state.step === 8) ? climaxPlayer : (activePlayer || bgmPlayer);
-      if (player.paused || !bgmState.isPlaying) {
-        bgmState.userUnlocked = true;
-        if (state.step === 8) {
-          player.play().then(() => {
-            bgmState.isPlaying = true;
-            updateMusicToggleUI();
-          }).catch(() => {});
-        } else {
-          const trackToPlay = bgmState.currentTrack || getEffectiveTrackForStep(state.step);
-          if (trackToPlay) {
-            fadePlay(trackToPlay);
-          }
-        }
-      } else {
-        player.pause();
+      const zone = currentMusicZone || getMusicZone(state.step === "cover" ? 0 : state.step);
+      const p = zonePlayers[zone];
+      if (musicEnabled && p && !p.paused) {
+        p.pause();
+        musicEnabled = false;
         bgmState.isPlaying = false;
         updateMusicToggleUI();
+      } else {
+        musicEnabled = true;
+        bgmState.userUnlocked = true;
+        if (currentMusicZone !== zone) {
+          playZone(zone);
+        } else {
+          p.muted = false;
+          p.volume = BGM_VOLUME;
+          p.play().then(() => { bgmState.isPlaying = true; updateMusicToggleUI(); }).catch(() => {});
+        }
       }
     }
 
-    // 瀏覽器安全政策處理：載入時先直接嘗試主動自動播放，若被攔截則掛載多重輕觸解鎖
-    function tryAutoplayOnLoad() {
-      if (state.step === "cover") return; // 開場信件頁面透過點擊「按下按鈕打開只屬於我們的篇章」優雅開啟
-      const initialTrack = getEffectiveTrackForStep(0);
-      if (!initialTrack) return;
-      // 嘗試直接自動播放
-      fadePlay(initialTrack).then(() => {
-        bgmState.userUnlocked = true;
-      }).catch(err => {
-        console.log("瀏覽器等待首次使用者互動以播放音訊：", err);
+    // 手機瀏覽器（特別是 iPhone）規定：每個播放器都要在使用者點擊時先「解鎖」一次，
+    // 之後才能在換頁時直接播放。這裡在第一次點擊時，靜音地把其他分區的播放器都解鎖並預先載入。
+    let playersPrimed = false;
+    function primeAllPlayers() {
+      if (playersPrimed) return;
+      playersPrimed = true;
+      Object.keys(zonePlayers).forEach(key => {
+        const zone = Number(key);
+        if (zone === currentMusicZone) return;
+        const p = zonePlayers[zone];
+        p.muted = true;
+        const pr = p.play();
+        const restore = () => {
+          if (currentMusicZone !== zone) {
+            p.pause();
+            try { p.currentTime = 0; } catch (e) {}
+          }
+          p.muted = false;
+        };
+        if (pr && pr.then) pr.then(restore).catch(() => { p.muted = false; });
+        else restore();
       });
     }
 
-    function unlockAudioOnFirstTouch() {
-      if (!bgmState.userUnlocked) {
-        bgmState.userUnlocked = true;
-        if (state.step !== "cover" && bgmPlayer.paused) {
-          currentMusicZone = getMusicZone(state.step);
-          let initialTrack = CONFIG.BGM.step0 || "./music1.mp3";
-          if (currentMusicZone === 2) initialTrack = CONFIG.BGM.step1 || "./music2.mp3";
-          if (currentMusicZone === 3) initialTrack = CONFIG.BGM.step2 || "./music3.mp3";
-          if (currentMusicZone === 4) {
-            playClimaxBgm();
-          } else {
-            fadePlay(initialTrack);
-          }
-        }
-      }
-      // 預熱大結局播放器與啟動背景快取
-      if (climaxPlayer) {
-        climaxPlayer.load();
-      }
-      initAudioPreloader();
+    // 預先載入所有音樂（保留舊函式名稱）
+    function initAudioPreloader() {
+      Object.values(zonePlayers).forEach(p => {
+        if (p.readyState === 0) { try { p.load(); } catch (e) {} }
+      });
     }
-    ["click", "touchstart", "pointerdown", "keydown"].forEach(evt => {
-      window.addEventListener(evt, unlockAudioOnFirstTouch, { once: true, passive: true });
+
+    function tryAutoplayOnLoad() {
+      // 開場信件頁面由「按下按鈕打開只屬於我們的篇章」開始播放音樂
+    }
+
+    function unlockAudioOnFirstTouch() {
+      bgmState.userUnlocked = true;
+      if (state.step !== "cover" && currentMusicZone === 0 && musicEnabled) {
+        playZone(getMusicZone(state.step));
+      }
+      primeAllPlayers();
+    }
+    ["click", "touchend", "keydown"].forEach(evt => {
       document.addEventListener(evt, unlockAudioOnFirstTouch, { once: true, passive: true });
     });
     elements.musicToggle.addEventListener("click", event => {
@@ -2685,14 +2585,10 @@
     const openStoryBtn = document.getElementById("openStoryBtn");
     if (openStoryBtn) {
       openStoryBtn.addEventListener("click", () => {
-        // 1. 百分之百解鎖瀏覽器限制，立即啟動並平滑淡入第一章音樂 (Zone 1)
+        // 1. 在點擊當下直接播放第一章音樂 (Zone 1)
         bgmState.userUnlocked = true;
-        currentMusicZone = 1;
-        fadePlay(CONFIG.BGM.step0 || "./music1.mp3");
-
-        // 預熱大結局音樂
-        if (climaxPlayer) climaxPlayer.load();
-        initAudioPreloader();
+        playZone(1);
+        primeAllPlayers();
 
         // 2. 播散浪漫愛心微粒並流暢切換至第一章
         throwTinyHearts({ x: window.innerWidth / 2, y: window.innerHeight / 2 });
