@@ -2220,7 +2220,7 @@
   <div class="modal-backdrop" id="summaryModal" role="dialog" aria-modal="true" aria-labelledby="modalTitle" aria-hidden="true">
     <div class="modal">
       <h2 id="modalTitle">最後確認一下 💌</h2>
-      <p>這份約會計畫準備送出囉。確認後會為妳發射紙飛機，也會寄到信箱。</p>
+      <p>這份約會計畫準備送出囉。</p>
       <div class="modal-summary" id="modalSummary"></div>
       <div class="modal-actions">
         <button class="button modal-cancel" id="modalCancel" type="button">再改一下</button>
@@ -2272,7 +2272,7 @@
         "妳確定嗎？🥺",
         "再想一下嘛……",
         "寶貝跟我和好嘛～好不好？",
-        "這一個月沒有妳，真的很不習慣。",
+        "這段時間沒有妳，真的很不習慣。",
         "我真的很想妳 😭",
         "別躲了～快點投降啦！",
         "按鈕都已經大成這樣了，只能選『要』了啦！😤",
@@ -2999,31 +2999,31 @@
       "記得吃早餐",
       "早點睡覺",
       "別熬夜了",
-      "多喝溫水",
+      "多點耐心",
       "今天辛苦了",
       "累了就休息",
-      "有我在呢",
+      "永遠愛我",
       "我想妳了",
       "要好好吃飯",
       "保持好心情",
       "平平安安",
       "抱抱妳",
-      "多喝水喔~",
-      "別給自己太大壓力",
+      "記得多喝水",
+      "別給自己太多壓力",
       "慢慢來不急",
       "順順利利",
-      "笑一個嘛",
+      "越來越漂亮",
       "路上小心",
-      "聽喜歡的歌",
-      "明天見",
-      "要幸福喔",
-      "記得戴圍巾",
-      "吃點甜的",
+      "越來越可愛",
+      "永遠陪著我",
+      "事事如意",
+      "少點焦慮",
+      "所願皆所得",
       "妳很棒",
       "做妳想做的事",
       "最喜歡妳了",
       "平安健康",
-      "記得穿暖暖",
+      "不要容貌焦慮",
       "今天也很想妳",
       "好好愛自己",
       "心情要好好的",
@@ -3231,7 +3231,7 @@
         const text = state.details[key] || (key === "other" ? state.otherText : "（細節到時候一起決定）");
         return `${activityInfo[key]?.icon || "•"} ${activityInfo[key]?.name || key}：${text}`;
       }).join("\n");
-      return `${header}\n\n小細節：\n${details}\n\n我們答應：見面不能擺臭臉、不生氣直接說、不要不耐煩。`;
+      return `${header}\n\n小細節：\n${details}\n\n我們答應：見面不能擺臭臉、不開心要直接說、不要不耐煩。`;
     }
 
     // Webhook 發送至 Google Apps Script Web App
