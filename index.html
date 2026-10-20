@@ -104,6 +104,10 @@
       background: radial-gradient(ellipse at 50% 30%, #171426 0%, #0d0b14 60%, #050508 100%) !important;
       overflow: hidden !important;
     }
+    body[data-step="9"] {
+      background: #000000 !important;
+      overflow: hidden !important;
+    }
 
     button, input, textarea, select { font: inherit; }
     button { -webkit-tap-highlight-color: transparent; }
@@ -716,14 +720,16 @@
     /* ════════════════════════════════════════════════════════════════
        💖 Step 8 終極大結局：黑夜星空 · 彩色便籤愛心與散落動畫
        ════════════════════════════════════════════════════════════════ */
-    body[data-step="8"] .app-shell {
+    body[data-step="8"] .app-shell,
+    body[data-step="9"] .app-shell {
       width: 100vw;
       max-width: 100vw;
       padding: 0;
       height: 100dvh;
       overflow: hidden;
     }
-    body[data-step="8"] .topbar {
+    body[data-step="8"] .topbar,
+    body[data-step="9"] .topbar {
       position: absolute;
       top: 0;
       left: 0;
@@ -733,7 +739,13 @@
       padding: max(12px, env(safe-area-inset-top)) 16px 0;
     }
     body[data-step="8"] .topbar .brand,
-    body[data-step="8"] .topbar .progress-wrap {
+    body[data-step="8"] .topbar .progress-wrap,
+    body[data-step="9"] .topbar .brand,
+    body[data-step="9"] .topbar .progress-wrap {
+      opacity: 0;
+      pointer-events: none;
+    }
+    body[data-step="9"] .topbar {
       opacity: 0;
       pointer-events: none;
     }
@@ -743,7 +755,9 @@
       color: #fff;
     }
     body[data-step="8"] .blob,
-    body[data-step="8"] .app-shell::before {
+    body[data-step="8"] .app-shell::before,
+    body[data-step="9"] .blob,
+    body[data-step="9"] .app-shell::before {
       display: none !important;
     }
 
@@ -951,6 +965,131 @@
     .bg-purple { background-color: #e5b3f8; }
     .bg-cyan   { background-color: #8de8f2; }
     .bg-rose   { background-color: #ff6e99; color: #ffffff; }
+
+    /* Step 8 底部「輕觸螢幕一下」柔和提示（看得到且完全不干擾畫面） */
+    .step8-tap-hint {
+      position: fixed;
+      bottom: max(18px, calc(env(safe-area-inset-bottom, 10px) + 12px));
+      left: 50%;
+      transform: translateX(-50%) translateY(8px);
+      z-index: 600;
+      padding: 6px 20px;
+      border-radius: 999px;
+      background: rgba(8, 7, 14, 0.76);
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
+      border: 1px solid rgba(255, 255, 255, 0.22);
+      box-shadow: 0 4px 18px rgba(0, 0, 0, 0.65);
+      color: rgba(255, 245, 248, 0.92);
+      font-size: 13.5px;
+      font-weight: 500;
+      letter-spacing: 0.18em;
+      text-indent: 0.18em;
+      white-space: nowrap;
+      user-select: none;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.9s ease, transform 0.9s ease;
+    }
+    .step8-tap-hint.visible {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+      pointer-events: auto;
+      cursor: pointer;
+      animation: tapHintBreathe 2.4s ease-in-out 0.9s infinite alternate;
+    }
+    @keyframes tapHintBreathe {
+      from {
+        opacity: 0.62;
+        text-shadow: 0 0 8px rgba(255, 185, 210, 0.35);
+      }
+      to {
+        opacity: 1;
+        text-shadow: 0 0 16px rgba(255, 195, 220, 0.85);
+      }
+    }
+
+    /* ════════════════════════════════════════════════════════════════
+       🖤 Step 9 最終黑幕真摯留言（純黑背景 · 打字機逐字浮現 · 關閉按鈕）
+       ════════════════════════════════════════════════════════════════ */
+    #step9 {
+      position: fixed;
+      inset: 0;
+      width: 100vw;
+      height: 100dvh;
+      background: #000000;
+      z-index: 25;
+      overflow: hidden;
+    }
+    #step9 .epilogue-stage {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 32px 28px;
+      text-align: center;
+      transition: opacity 1s ease;
+    }
+    #step9 .epilogue-stage.closed-fade {
+      opacity: 0;
+      pointer-events: none;
+    }
+    .epilogue-text {
+      max-width: 520px;
+      color: #f4f0f2;
+      font-size: clamp(16.5px, 4.3vw, 21px);
+      line-height: 2.05;
+      letter-spacing: 0.08em;
+      font-weight: 400;
+      margin: 0 0 38px 0;
+      min-height: 4.1em;
+      word-break: break-word;
+      text-shadow: 0 0 18px rgba(255, 255, 255, 0.14);
+    }
+    .epilogue-cursor {
+      display: inline-block;
+      margin-left: 3px;
+      color: rgba(255, 210, 225, 0.88);
+      font-weight: 300;
+      animation: epilogueBlink 0.85s steps(1) infinite;
+      transition: opacity 0.5s ease;
+    }
+    .epilogue-cursor.done {
+      opacity: 0;
+      animation: none;
+    }
+    @keyframes epilogueBlink {
+      0%, 49% { opacity: 1; }
+      50%, 100% { opacity: 0; }
+    }
+    .epilogue-close-btn {
+      appearance: none;
+      background: rgba(255, 255, 255, 0.08);
+      color: #f5eff2;
+      border: 1px solid rgba(255, 255, 255, 0.32);
+      border-radius: 999px;
+      padding: 11px 34px;
+      font-size: 14.5px;
+      letter-spacing: 0.16em;
+      text-indent: 0.16em;
+      cursor: pointer;
+      opacity: 0;
+      transform: translateY(10px);
+      pointer-events: none;
+      transition: opacity 0.8s ease, transform 0.8s ease, background 0.25s ease, border-color 0.25s ease;
+    }
+    .epilogue-close-btn.visible {
+      opacity: 1;
+      transform: translateY(0);
+      pointer-events: auto;
+    }
+    .epilogue-close-btn:hover,
+    .epilogue-close-btn:active {
+      background: rgba(255, 255, 255, 0.18);
+      border-color: rgba(255, 255, 255, 0.55);
+    }
 
     /* ════════════════════════════════════════════════════════════════
        💌 浪漫手折紙飛機全螢幕動畫層：信折成紙飛機 ➔ 流暢往右起飛
@@ -2134,6 +2273,9 @@
         <!-- 彈窗動態舞台容器 -->
         <div id="popupStage" class="popup-stage" aria-hidden="true"></div>
 
+        <!-- 滿版彈窗結束後浮現的輕觸提示 -->
+        <div id="step8TapHint" class="step8-tap-hint" role="button" tabindex="0" aria-label="輕觸螢幕一下進入最後一頁">輕觸螢幕一下</div>
+
         <!-- 隱藏保留 DOM 元件以利 JavaScript 背景運作 -->
         <div style="display:none;" aria-hidden="true">
           <p id="finalSummaryText"></p>
@@ -2141,6 +2283,14 @@
           <a id="lineShareButton" href="#">LINE 分享</a>
           <p id="deliveryNote"></p>
         </div>
+      </div>
+    </section>
+
+    <!-- Step 9: 最終黑幕打字機真摯留言 -->
+    <section class="step" id="step9" data-step="9" aria-label="最終留言">
+      <div class="epilogue-stage" id="epilogueStage">
+        <p class="epilogue-text"><span id="epilogueTyped"></span><span id="epilogueCursor" class="epilogue-cursor">|</span></p>
+        <button class="epilogue-close-btn" id="closeWebpageBtn" type="button">關閉</button>
       </div>
     </section>
   </main>
@@ -2416,7 +2566,7 @@
     function getMusicZone(stepIndex) {
       if (stepIndex === "cover" || stepIndex === 0 || stepIndex === "0") return 1;
       if (stepIndex === 1 || stepIndex === "1") return 2;
-      if (stepIndex === 8 || stepIndex === "8") return 4;
+      if (stepIndex === 8 || stepIndex === "8" || stepIndex === 9 || stepIndex === "9") return 4;
       return 3; // 2、proposal、3、4、5、6、7 全部屬於 Zone 3
     }
 
@@ -2644,7 +2794,7 @@
         $$(".progress-dots i").forEach((dot, index) => {
           dot.classList.toggle("done", index <= 3);
         });
-      } else if (state.step === 8) {
+      } else if (state.step === 8 || state.step === 9) {
         elements.progressText.textContent = "完成 ♥";
         $$(".progress-dots i").forEach(dot => dot.classList.add("done"));
       } else {
@@ -2720,6 +2870,8 @@
         window.scrollTo({ top: 0, behavior: "smooth" });
         if (nextStep === 8) {
           startSynchronizedClimaxShow();
+        } else if (nextStep === 9) {
+          startEpilogueTypewriter();
         }
       }, current ? 170 : 0);
     }
@@ -3165,12 +3317,21 @@
       return coords;
     }
 
+    let step8ReadyForTap = false;
+    let step8TapTimer = null;
+    let epilogueTypeTimer = null;
+    const EPILOGUE_MESSAGE = "這些就是在休息的時候做的，希望你會喜歡，如果喜歡的話也可大大方方的跟我說! 好啦，關掉這個網頁，去找那個用心對你的人吧~";
+
     function runTkinterLoveShow() {
       const stage = document.getElementById("popupStage");
       const hero = document.getElementById("centerHero");
+      const tapHint = document.getElementById("step8TapHint");
       if (!stage) return;
       stage.innerHTML = "";
       if (hero) hero.classList.remove("hidden");
+      step8ReadyForTap = false;
+      window.clearTimeout(step8TapTimer);
+      if (tapHint) tapHint.classList.remove("visible");
 
       const winW = window.innerWidth;
       const winH = window.innerHeight;
@@ -3245,8 +3406,8 @@
         { xMin: 0.02, xMax: 0.44, yMin: 0.02, yMax: 0.42 }, // 左上區
         { xMin: 0.52, xMax: 0.94, yMin: 0.02, yMax: 0.42 }, // 右上區
         { xMin: 0.22, xMax: 0.74, yMin: 0.28, yMax: 0.68 }, // 中央區
-        { xMin: 0.02, xMax: 0.44, yMin: 0.54, yMax: 0.94 }, // 左下區
-        { xMin: 0.52, xMax: 0.94, yMin: 0.54, yMax: 0.94 }  // 右下區
+        { xMin: 0.02, xMax: 0.44, yMin: 0.54, yMax: 0.90 }, // 左下區
+        { xMin: 0.52, xMax: 0.94, yMin: 0.54, yMax: 0.90 }  // 右下區
       ];
 
       const maxSpawnX = Math.max(10, winW - cardW);
@@ -3280,6 +3441,86 @@
         spawned += currentBatch;
         wave++;
       }
+
+      // 滿版視窗全部彈完後，畫面持續停留，並在底部浮現「輕觸螢幕一下」
+      const totalStormDuration = Math.round(wave * burstInterval) + 300;
+      step8TapTimer = window.setTimeout(() => {
+        if (state.step !== 8) return;
+        step8ReadyForTap = true;
+        const tapHint = document.getElementById("step8TapHint");
+        if (tapHint) tapHint.classList.add("visible");
+      }, totalStormDuration);
+    }
+
+    // Step 8 輕觸畫面進入最終黑幕打字機頁面 (Step 9)
+    const step8Section = document.getElementById("step8");
+    if (step8Section) {
+      step8Section.addEventListener("click", () => {
+        if (state.step !== 8 || !step8ReadyForTap) return;
+        step8ReadyForTap = false;
+        showStep(9);
+      });
+    }
+
+    // Step 9 打字機逐字浮現效果 + 完成後顯示關閉按鈕
+    function startEpilogueTypewriter() {
+      const typedEl = document.getElementById("epilogueTyped");
+      const cursorEl = document.getElementById("epilogueCursor");
+      const closeBtn = document.getElementById("closeWebpageBtn");
+      const epilogueStage = document.getElementById("epilogueStage");
+      if (!typedEl) return;
+
+      window.clearTimeout(epilogueTypeTimer);
+      typedEl.textContent = "";
+      if (cursorEl) cursorEl.classList.remove("done");
+      if (closeBtn) closeBtn.classList.remove("visible");
+      if (epilogueStage) epilogueStage.classList.remove("closed-fade");
+
+      const chars = Array.from(EPILOGUE_MESSAGE);
+      let idx = 0;
+
+      const typeNextChar = () => {
+        if (state.step !== 9) return;
+        if (idx < chars.length) {
+          const ch = chars[idx];
+          typedEl.textContent += ch;
+          idx++;
+          const isPausePunct = ch === "，" || ch === "!" || ch === "！" || ch === "~" || ch === "～";
+          const nextDelay = isPausePunct ? 380 : 95;
+          epilogueTypeTimer = window.setTimeout(typeNextChar, nextDelay);
+        } else {
+          // 全部文字打完，游標淡出、底下浮現「關閉」按鈕
+          epilogueTypeTimer = window.setTimeout(() => {
+            if (cursorEl) cursorEl.classList.add("done");
+            if (closeBtn) closeBtn.classList.add("visible");
+          }, 350);
+        }
+      };
+
+      // 進入全黑畫面後微停 550ms 開始逐字打出
+      epilogueTypeTimer = window.setTimeout(typeNextChar, 550);
+    }
+
+    const closeWebpageBtn = document.getElementById("closeWebpageBtn");
+    if (closeWebpageBtn) {
+      closeWebpageBtn.addEventListener("click", () => {
+        // 停止音樂
+        musicEnabled = false;
+        bgmState.isPlaying = false;
+        Object.values(zonePlayers).forEach(p => { try { p.pause(); } catch (e) {} });
+
+        // 畫面柔和淡入純黑謝幕
+        const epilogueStage = document.getElementById("epilogueStage");
+        if (epilogueStage) epilogueStage.classList.add("closed-fade");
+
+        // 嘗試關閉視窗 / 分頁（支援 LINE / 內嵌瀏覽器 / 一般視窗）
+        window.setTimeout(() => {
+          try { if (window.liff && window.liff.closeWindow) window.liff.closeWindow(); } catch (e) {}
+          try { if (window.WeixinJSBridge) window.WeixinJSBridge.call("closeWindow"); } catch (e) {}
+          try { window.open("", "_self"); window.close(); } catch (e) {}
+          try { window.close(); } catch (e) {}
+        }, 450);
+      });
     }
 
     function getPlanObject(eventType) {
