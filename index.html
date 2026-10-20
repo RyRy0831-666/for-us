@@ -2433,11 +2433,32 @@
       tracks.forEach(preloadAudioTrack);
     }
 
+    // ════════════════════════════════════════════════════════════════════
+    // 🎵 四大專屬音樂分區（保證全站換頁絕不跳歌、中間頁面一曲到底絕對連貫）
+    // Zone 1：第一章 (step0) -> music1.mp3
+    // Zone 2：第二章 (step1) -> music2.mp3
+    // Zone 3：中間所有頁面 (step2 ~ step7，含 proposal 約會約定) -> music3.mp3 (一曲到底不中斷)
+    // Zone 4：大結局 (step8 我也喜歡你) -> music4.mp3 (獨立音軌秒開爆發)
+    // ════════════════════════════════════════════════════════════════════
+    function getMusicZone(stepIndex) {
+      if (stepIndex === "cover" || stepIndex === 0 || stepIndex === "0") return 1;
+      if (stepIndex === 1 || stepIndex === "1") return 2;
+      if (stepIndex === 8 || stepIndex === "8") return 4;
+      // 所有中間頁面：2, "proposal", 3, 4, 5, 6, 7 全部鎖定為 Zone 3！
+      return 3;
+    }
+
+    let currentMusicZone = 0;
+
     function isSameTrack(trackA, trackB) {
       if (!trackA || !trackB) return false;
       if (trackA === trackB) return true;
-      const getFileName = s => decodeURIComponent(String(s)).split(/[?#]/)[0].split("/").pop().toLowerCase();
-      return getFileName(trackA) === getFileName(trackB);
+      const clean = s => decodeURIComponent(String(s))
+        .split(/[?#]/)[0]
+        .split("/").pop()
+        .toLowerCase()
+        .replace(/\.mp4$/, "");
+      return clean(trackA) === clean(trackB);
     }
 
     function updateMusicToggleUI() {
@@ -2558,26 +2579,39 @@
 
     function switchBgmForStep(stepIndex) {
       if (stepIndex === "cover") return;
-      if (stepIndex === 8) {
+
+      const targetZone = getMusicZone(stepIndex);
+
+      // 【核心保證】：如果目標頁面與當前頁面屬於同一個音樂分區（特別是中間所有頁面 Zone 3），
+      // 絕對不做任何切歌動作！不暫停、不重設進度、不重新淡入淡出，保證一曲到底、完全連貫播放！
+      if (targetZone === currentMusicZone) {
+        // 若之前被意外暫停，且目前狀態仍應播放，則無縫續播（不重設時間）
+        if (activePlayer && activePlayer.paused && bgmState.userUnlocked && bgmState.isPlaying) {
+          activePlayer.play().catch(() => {});
+        }
+        return;
+      }
+
+      // 跨入不同分區，更新當前分區標記
+      currentMusicZone = targetZone;
+
+      if (targetZone === 4) {
+        // 進入大結局 Zone 4：啟動 climaxPlayer
         playClimaxBgm();
         return;
       }
+
+      // 如果從大結局退回或切換，停下 climaxPlayer，切回 bgmPlayer
       if (climaxPlayer && !climaxPlayer.paused) {
         climaxPlayer.pause();
       }
       activePlayer = bgmPlayer;
-      const targetTrack = getEffectiveTrackForStep(stepIndex);
-      // 如果目標曲目與目前播放曲目相同，絕對不重新播放，維持連貫進行！
-      if (isSameTrack(targetTrack, bgmState.currentTrack)) {
-        if (bgmPlayer.paused && bgmState.userUnlocked) {
-          bgmPlayer.play().then(() => {
-            bgmState.isPlaying = true;
-            updateMusicToggleUI();
-          }).catch(() => {});
-        }
-        return;
-      }
-      if (targetTrack && bgmState.userUnlocked) {
+
+      let targetTrack = CONFIG.BGM.step0 || "./music1.mp3";
+      if (targetZone === 2) targetTrack = CONFIG.BGM.step1 || "./music2.mp3";
+      if (targetZone === 3) targetTrack = CONFIG.BGM.step2 || "./music3.mp3";
+
+      if (bgmState.userUnlocked) {
         fadePlay(targetTrack);
       }
     }
@@ -2620,9 +2654,16 @@
     function unlockAudioOnFirstTouch() {
       if (!bgmState.userUnlocked) {
         bgmState.userUnlocked = true;
-        const initialTrack = getEffectiveTrackForStep(state.step);
-        if (initialTrack && bgmPlayer.paused && state.step !== "cover") {
-          fadePlay(initialTrack);
+        if (state.step !== "cover" && bgmPlayer.paused) {
+          currentMusicZone = getMusicZone(state.step);
+          let initialTrack = CONFIG.BGM.step0 || "./music1.mp3";
+          if (currentMusicZone === 2) initialTrack = CONFIG.BGM.step1 || "./music2.mp3";
+          if (currentMusicZone === 3) initialTrack = CONFIG.BGM.step2 || "./music3.mp3";
+          if (currentMusicZone === 4) {
+            playClimaxBgm();
+          } else {
+            fadePlay(initialTrack);
+          }
         }
       }
       // 預熱大結局播放器與啟動背景快取
@@ -2644,8 +2685,9 @@
     const openStoryBtn = document.getElementById("openStoryBtn");
     if (openStoryBtn) {
       openStoryBtn.addEventListener("click", () => {
-        // 1. 百分之百解鎖瀏覽器限制，立即啟動並平滑淡入第一章音樂
+        // 1. 百分之百解鎖瀏覽器限制，立即啟動並平滑淡入第一章音樂 (Zone 1)
         bgmState.userUnlocked = true;
+        currentMusicZone = 1;
         fadePlay(CONFIG.BGM.step0 || "./music1.mp3");
 
         // 預熱大結局音樂
