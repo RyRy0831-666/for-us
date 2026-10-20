@@ -5,6 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, viewport-fit=cover" />
   <meta name="theme-color" content="#fff8f1" />
   <title>和好吧｜專屬約會邀約</title>
+  <!-- 提前預先載入大結局音樂，保證最後一頁零延遲同步爆發 -->
+  <link rel="preload" href="./music4.mp3" as="fetch" type="audio/mpeg" crossorigin />
+  <link rel="preload" href="./music1.mp3" as="fetch" type="audio/mpeg" crossorigin />
   <style>
     /*
       ╭──────────────────────────────────────────────────────────╮
@@ -1871,7 +1874,7 @@
         <h1 id="chapter0Title">第一章</h1>
         <div class="letter-stage">
           <p>
-            冷靜這段時間想了很多。當初會吵架，是我當時不知道怎麼好好跟你說我需要休息。這段時間寫程式、反覆修改，準備了這份禮物。我認真想過我們之間的一切。如果還可以的話，我想換一種方式和你相處，好好在一起。
+            冷靜這段時間我想了很多。之前會起衝突，是當時我不知道該怎麼好好跟你說想休息這件事。這段期間我花很多時間寫程式，bug 改了一遍又一遍，準備了這份禮物。難哄這部劇我看了兩遍，也從裡面想了很多關於我們之間的事，知道兩個人相處本來就不容易。只是讓你知道，我認真看待這段感情。
           </p>
         </div>
         <button class="button wide" id="toStep1Btn" type="button">下一頁 ➔</button>
@@ -1948,17 +1951,17 @@
       <div class="paper-card">
         <!-- Decorative Maple Stamp -->
         <div class="maple-stamp" aria-hidden="true">
-          <span>🍁 11.01 · 相見</span>
+          <span>🍁 11.01 · 重逢</span>
         </div>
 
         <p class="eyebrow">Part one · our date proposal</p>
         <h1 id="proposalTitle">那我們約 11/1<br>見面好嗎？🍁</h1>
-        <p class="subheading">我把回國後的隔天留給妳，想把準備好的禮物送給妳，時間讓妳決定！</p>
+        <p class="subheading">我把回國後的隔天留給妳，想當面把準備好的禮物送給妳，時間由妳決定！</p>
 
         <div class="proposal-story">
           <div class="proposal-story-quote" aria-hidden="true">“</div>
           <p>
-            我從加拿大回來的隔天（11/1）就想見到妳。這段時間除了寫程式、改 bug 準備這份禮物，心裡也一直想著妳。希望回國第一時間，約在我們最常去的地方，把這份禮物交到妳手上。
+            我從加拿大回來的隔天（11/1）就想見到妳。這段時間除了反覆寫程式、改 bug 準備這份禮物，心裡也一直想著妳。希望回國第一時間，約在我們彼此最熟悉的老地方，親手把這份心意交到妳手上。
           </p>
         </div>
 
@@ -1973,7 +1976,7 @@
           <div class="plan-card-row plan-card-row-time">
             <span class="plan-card-icon" aria-hidden="true">⏰</span>
             <div class="plan-card-info" style="width: 100%;">
-              <label for="proposalTimeInput" class="plan-card-label">見面時間（妳訂幾點都可以 ✨）</label>
+              <label for="proposalTimeInput" class="plan-card-label">見面時間（由妳訂幾點都可以 ✨）</label>
               <div class="input-wrap time proposal-time-wrap">
                 <input type="time" id="proposalTimeInput" value="18:30" required aria-label="11月1日想見面的時間" />
               </div>
@@ -1983,14 +1986,14 @@
             <span class="plan-card-icon" aria-hidden="true">📍</span>
             <div class="plan-card-info">
               <span class="plan-card-label">約定地點</span>
-              <span class="plan-card-val">我們最熟悉的地方</span>
+              <span class="plan-card-val">我們彼此最熟悉的地方</span>
             </div>
           </div>
           <div class="plan-card-row">
             <span class="plan-card-icon" aria-hidden="true">🎁</span>
             <div class="plan-card-info">
               <span class="plan-card-label">專屬心意</span>
-              <span class="plan-card-val">把這份禮物送給妳</span>
+              <span class="plan-card-val">親手把這份禮物送給妳</span>
             </div>
           </div>
         </div>
@@ -2051,14 +2054,14 @@
         <h1 id="rulesTitle">專屬我們的<br>約會守則 📜</h1>
         <p class="subheading">出門前請先答應我這幾條小約定～</p>
         <div class="rule-list" id="ruleList">
-          <label class="rule-card"><input type="checkbox" data-rule="hug" /><span class="fake-checkbox" aria-hidden="true"></span><span class="rule-copy"><b>1.</b>可以好好說話。</span></label>
-          <label class="rule-card"><input type="checkbox" data-rule="talk" /><span class="fake-checkbox" aria-hidden="true"></span><span class="rule-copy"><b>2.</b>不准生氣，有什麼不開心都要直接說。</span></label>
+          <label class="rule-card"><input type="checkbox" data-rule="hug" /><span class="fake-checkbox" aria-hidden="true"></span><span class="rule-copy"><b>1.</b>見面時不能擺臭臉。</span></label>
+          <label class="rule-card"><input type="checkbox" data-rule="talk" /><span class="fake-checkbox" aria-hidden="true"></span><span class="rule-copy"><b>2.</b>今天不准生氣，有什麼不開心都要直接說。</span></label>
           <label class="rule-card"><input type="checkbox" data-rule="eat" /><span class="fake-checkbox" aria-hidden="true"></span><span class="rule-copy"><b>3.</b>一起吃好吃的。</span></label>
-          <label class="rule-card"><input type="checkbox" data-rule="hands" /><span class="fake-checkbox" aria-hidden="true"></span><span class="rule-copy"><b>4.</b>不要對我不耐煩。</span></label>
-          <label class="rule-card"><input type="checkbox" data-rule="love" /><span class="fake-checkbox" aria-hidden="true"></span><span class="rule-copy"><b>5.</b>你自己猜。</span></label>
+          <label class="rule-card"><input type="checkbox" data-rule="hands" /><span class="fake-checkbox" aria-hidden="true"></span><span class="rule-copy"><b>4.</b>不要不耐煩。</span></label>
+          <label class="rule-card"><input type="checkbox" data-rule="love" /><span class="fake-checkbox" aria-hidden="true"></span><span class="rule-copy"><b>5.</b>你自己想。</span></label>
         </div>
         <button class="button wide" id="rulesButton" type="button">我答應遵守，下一步</button>
-        <p class="message" id="rulesMessage" role="alert">還有約定沒有打勾勾唷！要全部答應才能進入下一步 🥺</p>
+        <p class="message" id="rulesMessage" role="alert">還有約定沒有打勾勾喔！要全部答應才能進入下一步 🥺</p>
       </div>
     </section>
 
@@ -2076,7 +2079,7 @@
 
         <p class="eyebrow">Part three · our little list</p>
         <h1 id="activityTitle">那一天，妳想<br>做什麼？✨</h1>
-        <p class="subheading">可以多選唷，想做什麼我都陪妳去！</p>
+        <p class="subheading">可以多選喔，想做什麼我都陪妳去！</p>
         <div class="choice-grid" id="activityGrid">
           <button class="choice-card" type="button" data-activity="movie" aria-pressed="false"><span class="choice-icon">🍿</span><strong>看電影</strong></button>
           <button class="choice-card" type="button" data-activity="dinner" aria-pressed="false"><span class="choice-icon">🍽️</span><strong>吃大餐 / 小吃</strong></button>
@@ -2127,7 +2130,7 @@
       <div class="paper-card final-page">
         <!-- 愛心正中央：「我也喜歡你」核心文字 (完全不被愛心擋到) -->
         <div class="center-hero" id="centerHero">
-          <div class="center-hero-heart">💝</div>
+          <div class="center-hero-heart">💖</div>
           <h1 class="grand-love-title center-hero-text" id="finalTitle">我也喜歡你</h1>
         </div>
 
@@ -2220,7 +2223,7 @@
   <div class="modal-backdrop" id="summaryModal" role="dialog" aria-modal="true" aria-labelledby="modalTitle" aria-hidden="true">
     <div class="modal">
       <h2 id="modalTitle">最後確認一下 💌</h2>
-      <p>這份約會計畫準備送出囉。</p>
+      <p>這份約會計畫準備送出囉。確認後會為妳發射紙飛機，也會寄到信箱。</p>
       <div class="modal-summary" id="modalSummary"></div>
       <div class="modal-actions">
         <button class="button modal-cancel" id="modalCancel" type="button">再改一下</button>
@@ -2272,7 +2275,7 @@
         "妳確定嗎？🥺",
         "再想一下嘛……",
         "寶貝跟我和好嘛～好不好？",
-        "這段時間沒有妳，真的很不習慣。",
+        "這一個月沒有妳，真的很不習慣。",
         "我真的很想妳 😭",
         "別躲了～快點投降啦！",
         "按鈕都已經大成這樣了，只能選『要』了啦！😤",
@@ -2372,11 +2375,63 @@
       bgmPlayer.play().catch(() => {});
     });
 
+    // 💖 大結局專屬獨立播放器 (Step 8 專用，預快取記憶體音軌，保證點擊瞬間 0 延遲同步暴擊)
+    const climaxPlayer = new Audio();
+    climaxPlayer.loop = true;
+    climaxPlayer.preload = "auto";
+    climaxPlayer.volume = 0.85;
+    climaxPlayer.src = CONFIG.BGM.step8 || "./music4.mp3";
+    climaxPlayer.addEventListener("ended", () => {
+      climaxPlayer.currentTime = 0;
+      climaxPlayer.play().catch(() => {});
+    });
+
+    let activePlayer = bgmPlayer;
+
     const bgmState = {
       isPlaying: false,
       currentTrack: "",
       userUnlocked: false
     };
+
+    // ⚡ 全曲音訊 Blob 記憶體預快取池 (將音訊預先載入手機 RAM，切換時零等待)
+    const audioBlobCache = {};
+
+    function preloadAudioTrack(url) {
+      if (!url || audioBlobCache[url]) return;
+      fetch(url)
+        .then(res => {
+          if (!res.ok) throw new Error("Audio HTTP " + res.status);
+          return res.blob();
+        })
+        .then(blob => {
+          const blobUrl = URL.createObjectURL(blob);
+          audioBlobCache[url] = blobUrl;
+          if (url.includes("music4.mp3") || url === CONFIG.BGM.step8) {
+            climaxPlayer.src = blobUrl;
+            climaxPlayer.load();
+          }
+        })
+        .catch(err => {
+          // 若為本機 file 協定或離線狀態，退回正常直連
+          if (url.includes("music4.mp3") || url === CONFIG.BGM.step8) {
+            if (!climaxPlayer.src) {
+              climaxPlayer.src = url;
+              climaxPlayer.load();
+            }
+          }
+        });
+    }
+
+    function initAudioPreloader() {
+      const tracks = [
+        CONFIG.BGM.step8 || "./music4.mp3",
+        CONFIG.BGM.step2 || "./music3.mp3",
+        CONFIG.BGM.step1 || "./music2.mp3",
+        CONFIG.BGM.step0 || "./music1.mp3"
+      ];
+      tracks.forEach(preloadAudioTrack);
+    }
 
     function isSameTrack(trackA, trackB) {
       if (!trackA || !trackB) return false;
@@ -2388,7 +2443,9 @@
     function updateMusicToggleUI() {
       const btn = elements.musicToggle;
       if (!btn) return;
-      if (bgmState.isPlaying) {
+      const player = (state.step === 8) ? climaxPlayer : (activePlayer || bgmPlayer);
+      const isActuallyPlaying = bgmState.isPlaying && player && !player.paused;
+      if (isActuallyPlaying || bgmState.isPlaying) {
         btn.classList.add("playing");
         btn.classList.remove("paused");
         btn.title = "點擊暫停背景音樂";
@@ -2429,7 +2486,7 @@
         }
         if (bgmFadeToken !== currentToken) return;
         bgmPlayer.pause();
-        bgmPlayer.src = src;
+        bgmPlayer.src = audioBlobCache[src] || src;
         bgmPlayer.currentTime = 0;
         bgmPlayer.volume = 0;
         bgmPlayer.loop = true;
@@ -2475,8 +2532,40 @@
       return CONFIG.BGM[`step${stepIndex}`] || CONFIG.BGM.step0 || "./music1.mp3";
     }
 
+    // 大結局專用切換：瞬間停掉舊歌，滿音量直下 music4，零淡入延遲
+    function playClimaxBgm() {
+      if (bgmPlayer && !bgmPlayer.paused) {
+        bgmPlayer.pause();
+      }
+      activePlayer = climaxPlayer;
+      bgmState.currentTrack = CONFIG.BGM.step8 || "./music4.mp3";
+
+      climaxPlayer.currentTime = 0;
+      climaxPlayer.volume = 0.85;
+
+      const playPromise = climaxPlayer.play();
+      if (playPromise !== undefined) {
+        playPromise.then(() => {
+          bgmState.isPlaying = true;
+          updateMusicToggleUI();
+        }).catch(err => {
+          console.warn("大結局音訊播放提示：", err);
+          bgmState.isPlaying = false;
+          updateMusicToggleUI();
+        });
+      }
+    }
+
     function switchBgmForStep(stepIndex) {
       if (stepIndex === "cover") return;
+      if (stepIndex === 8) {
+        playClimaxBgm();
+        return;
+      }
+      if (climaxPlayer && !climaxPlayer.paused) {
+        climaxPlayer.pause();
+      }
+      activePlayer = bgmPlayer;
       const targetTrack = getEffectiveTrackForStep(stepIndex);
       // 如果目標曲目與目前播放曲目相同，絕對不重新播放，維持連貫進行！
       if (isSameTrack(targetTrack, bgmState.currentTrack)) {
@@ -2494,14 +2583,22 @@
     }
 
     function toggleMusic() {
-      if (bgmPlayer.paused || !bgmState.isPlaying) {
-        const trackToPlay = bgmState.currentTrack || getEffectiveTrackForStep(state.step);
-        if (trackToPlay) {
-          bgmState.userUnlocked = true;
-          fadePlay(trackToPlay);
+      const player = (state.step === 8) ? climaxPlayer : (activePlayer || bgmPlayer);
+      if (player.paused || !bgmState.isPlaying) {
+        bgmState.userUnlocked = true;
+        if (state.step === 8) {
+          player.play().then(() => {
+            bgmState.isPlaying = true;
+            updateMusicToggleUI();
+          }).catch(() => {});
+        } else {
+          const trackToPlay = bgmState.currentTrack || getEffectiveTrackForStep(state.step);
+          if (trackToPlay) {
+            fadePlay(trackToPlay);
+          }
         }
       } else {
-        bgmPlayer.pause();
+        player.pause();
         bgmState.isPlaying = false;
         updateMusicToggleUI();
       }
@@ -2524,10 +2621,15 @@
       if (!bgmState.userUnlocked) {
         bgmState.userUnlocked = true;
         const initialTrack = getEffectiveTrackForStep(state.step);
-        if (initialTrack && bgmPlayer.paused) {
+        if (initialTrack && bgmPlayer.paused && state.step !== "cover") {
           fadePlay(initialTrack);
         }
       }
+      // 預熱大結局播放器與啟動背景快取
+      if (climaxPlayer) {
+        climaxPlayer.load();
+      }
+      initAudioPreloader();
     }
     ["click", "touchstart", "pointerdown", "keydown"].forEach(evt => {
       window.addEventListener(evt, unlockAudioOnFirstTouch, { once: true, passive: true });
@@ -2545,6 +2647,10 @@
         // 1. 百分之百解鎖瀏覽器限制，立即啟動並平滑淡入第一章音樂
         bgmState.userUnlocked = true;
         fadePlay(CONFIG.BGM.step0 || "./music1.mp3");
+
+        // 預熱大結局音樂
+        if (climaxPlayer) climaxPlayer.load();
+        initAudioPreloader();
 
         // 2. 播散浪漫愛心微粒並流暢切換至第一章
         throwTinyHearts({ x: window.innerWidth / 2, y: window.innerHeight / 2 });
@@ -2618,6 +2724,37 @@
     }
     function hideMessage(element) { element.className = "message"; }
 
+    let climaxAnimationTriggered = false;
+    function startSynchronizedClimaxShow() {
+      if (climaxAnimationTriggered) return;
+
+      const runVisuals = () => {
+        if (climaxAnimationTriggered) return;
+        climaxAnimationTriggered = true;
+        if (typeof runTkinterLoveShow === "function") {
+          runTkinterLoveShow();
+        }
+      };
+
+      // 如果大結局音樂已經在播（或已開始解碼輸出），立即開始畫面！
+      if (climaxPlayer && !climaxPlayer.paused && climaxPlayer.currentTime > 0) {
+        runVisuals();
+        return;
+      }
+
+      // 若微秒級別等待音訊出聲，監聽 playing 確保第一道音符與第一張卡片同時誕生！
+      if (climaxPlayer) {
+        const onPlaying = () => {
+          climaxPlayer.removeEventListener("playing", onPlaying);
+          runVisuals();
+        };
+        climaxPlayer.addEventListener("playing", onPlaying, { once: true });
+      }
+
+      // 逾時保險：最多等 140ms，即使在極端靜音或無音訊環境，視覺畫面也絕不延誤卡住
+      window.setTimeout(runVisuals, 140);
+    }
+
     function showStep(nextStep) {
       let targetId = "step" + nextStep;
       if (nextStep === "cover") targetId = "stepCover";
@@ -2628,6 +2765,9 @@
       state.step = nextStep;
       document.body.setAttribute("data-step", String(nextStep));
       updateProgress();
+      if (nextStep !== 8) {
+        climaxAnimationTriggered = false;
+      }
       if (nextStep !== "cover") {
         switchBgmForStep(nextStep); // 依關卡自動切換音樂
       }
@@ -2640,8 +2780,8 @@
       window.setTimeout(() => {
         next.classList.add("active");
         window.scrollTo({ top: 0, behavior: "smooth" });
-        if (nextStep === 8 && typeof runTkinterLoveShow === "function") {
-          runTkinterLoveShow();
+        if (nextStep === 8) {
+          startSynchronizedClimaxShow();
         }
       }, current ? 170 : 0);
     }
@@ -2999,31 +3139,31 @@
       "記得吃早餐",
       "早點睡覺",
       "別熬夜了",
-      "多點耐心",
+      "多喝溫水",
       "今天辛苦了",
       "累了就休息",
-      "永遠愛我",
+      "有我在呢",
       "我想妳了",
       "要好好吃飯",
       "保持好心情",
       "平平安安",
       "抱抱妳",
-      "記得多喝水",
-      "別給自己太多壓力",
+      "多喝水喔~",
+      "別給自己太大壓力",
       "慢慢來不急",
       "順順利利",
-      "越來越漂亮",
+      "笑一個嘛",
       "路上小心",
-      "越來越可愛",
-      "永遠陪著我",
-      "事事如意",
-      "少點焦慮",
-      "所願皆所得",
+      "聽喜歡的歌",
+      "明天見",
+      "要幸福喔",
+      "記得戴圍巾",
+      "吃點甜的",
       "妳很棒",
       "做妳想做的事",
       "最喜歡妳了",
       "平安健康",
-      "不要容貌焦慮",
+      "記得穿暖暖",
       "今天也很想妳",
       "好好愛自己",
       "心情要好好的",
@@ -3231,7 +3371,7 @@
         const text = state.details[key] || (key === "other" ? state.otherText : "（細節到時候一起決定）");
         return `${activityInfo[key]?.icon || "•"} ${activityInfo[key]?.name || key}：${text}`;
       }).join("\n");
-      return `${header}\n\n小細節：\n${details}\n\n我們答應：見面不能擺臭臉、不開心要直接說、不要不耐煩。`;
+      return `${header}\n\n小細節：\n${details}\n\n我們答應：見面不能擺臭臉、不生氣直接說、不要不耐煩。`;
     }
 
     // Webhook 發送至 Google Apps Script Web App
@@ -3291,6 +3431,7 @@
     document.body.setAttribute("data-step", "cover");
     updateProgress();
     tryAutoplayOnLoad();
+    initAudioPreloader();
 
 
   </script>
