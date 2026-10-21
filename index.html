@@ -6,7 +6,13 @@
   <meta name="theme-color" content="#fff8f1" />
   <title>和好吧｜專屬約會邀約</title>
   <style>
-    
+    /*
+      ╭──────────────────────────────────────────────────────────╮
+      │  和好吧：單檔版 SPA（真摯告白 + 和好約會邀請）             │
+      │  這個檔案不需任何套件，可直接用瀏覽器開啟。                │
+      │  音樂、照片、Webhook 與文案設定請在下方 JavaScript 的 CONFIG。 │
+      ╰──────────────────────────────────────────────────────────╯
+    */
     :root {
       --ink: #55362f;
       --ink-soft: #89665f;
@@ -1023,30 +1029,53 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      justify-content: center;
-      padding: 32px 28px;
+      padding: 32px 22px;
       text-align: center;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
       transition: opacity 1s ease;
+    }
+    /* margin:auto → 內容少時垂直置中，內容多時從頂部開始並可往下捲動（不會被切掉） */
+    #step9 .epilogue-inner {
+      margin: auto 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 100%;
     }
     #step9 .epilogue-stage.closed-fade {
       opacity: 0;
       pointer-events: none;
     }
     .epilogue-text {
-      max-width: 520px;
+      max-width: 680px;
       color: #f4f0f2;
-      font-size: clamp(16.5px, 4.3vw, 21px);
-      line-height: 2.05;
-      letter-spacing: 0.08em;
+      font-size: clamp(15.5px, 4vw, 20px);
+      line-height: 1.95;
+      letter-spacing: 0.06em;
       font-weight: 400;
-      margin: 0 0 38px 0;
-      min-height: 4.1em;
-      word-break: break-word;
+      margin: 0 0 34px 0;
+      min-height: 4em;
       text-shadow: 0 0 18px rgba(255, 255, 255, 0.14);
+    }
+    /* 每一句（以標點分段）是一個整體，放不下時整句換到下一行，不會話說到一半被切斷 */
+    .epilogue-clause {
+      display: inline-block;
+      max-width: 100%;
+      white-space: normal;
+      word-break: break-word;
+    }
+    .epilogue-char {
+      opacity: 0;
+      transition: opacity 0.18s ease;
+    }
+    .epilogue-char.shown {
+      opacity: 1;
     }
     .epilogue-cursor {
       display: inline-block;
-      margin-left: 3px;
+      width: 0;
+      overflow: visible;
       color: rgba(255, 210, 225, 0.88);
       font-weight: 300;
       animation: epilogueBlink 0.85s steps(1) infinite;
@@ -1059,6 +1088,18 @@
     @keyframes epilogueBlink {
       0%, 49% { opacity: 1; }
       50%, 100% { opacity: 0; }
+    }
+    /* 「關閉網頁」按鈕底下的小小附註 */
+    .epilogue-footnote {
+      display: none;
+      margin: 18px 0 0;
+      color: rgba(255, 196, 214, 0.78);
+      font-size: 13.5px;
+      letter-spacing: 0.06em;
+    }
+    .epilogue-footnote.visible {
+      display: block;
+      animation: epilogueBtnIn 0.7s ease-out 0.5s both;
     }
     .epilogue-close-btn {
       appearance: none;
@@ -1816,6 +1857,13 @@
       position: relative;
       overflow: hidden;
     }
+    /* 「給妳的一封信」標題置中（全域 h1 有 max-width，需左右 auto 才會真正置中） */
+    .cover-page h1 {
+      margin-left: auto;
+      margin-right: auto;
+      letter-spacing: 0.02em;
+      text-align: center;
+    }
     .envelope-art-wrap {
       display: flex;
       justify-content: center;
@@ -2017,7 +2065,7 @@
         <h1 id="chapter0Title">第一章</h1>
         <div class="letter-stage">
           <p>
-            冷靜這段時間我想了很多。之前會起衝突，是當時我不知道該怎麼好好跟你說想休息這件事。這段期間我花很多時間寫程式，bug 改了一遍又一遍，準備了這份禮物。難哄這部劇我看了兩遍，也從裡面想了很多關於我們之間的事，知道兩個人相處本來就不容易。只是讓你知道，我很認真的看待這段感情。
+            冷靜這段時間我想了很多。之前會起衝突，是當時我不知道該怎麼好好跟你說想休息這件事。這段期間我花很多時間寫程式，bug 改了一遍又一遍，準備了這份禮物。難哄這部劇我看了兩遍，也從裡面想了很多關於我們之間的事，知道兩個人相處本來就不容易。只是讓你知道，我認真看待這段感情。
           </p>
         </div>
         <button class="button wide" id="toStep1Btn" type="button">下一頁 ➔</button>
@@ -2032,7 +2080,7 @@
         <h1 id="chapter1Title">第二章</h1>
         <div class="letter-stage">
           <p>
-            我一開始真的很需要一個答案，所以我問了你"要不要跟我在一起"，然後你給我的答案是不知道，你後面也有解釋，其實當時我就覺得我可以接受這個答案，但因為當時就已經想好要做這些東西給你了，但我很怕我做了之後我們分開，所以我才會想要一個答案，但最後我自己還是堅信我們會在一起的，我反覆問了自己好幾次。我知道你現在很忙，有工作有功課，你很難有其他心力去處理感情的事情，我也想要讓你覺得跟我相處是一件輕鬆的事情，在講話的上面我也儘量不要給你壓力，我現在也在學會努力不要把整個人的重心都在你身上，我們都有各自的生活，能相處的時間變少了，但還是可以在一起啊，我們就用那少少的時間陪伴彼此，我覺得我也很開心。我其實不知道讓你休息的這些天，你在想什麼，我其實也很害怕，你會不會就說你不想繼續了，但我相信你不會的，我相信你心裡還是有我的，只是你很彆扭都不敢說。
+            我一開始真的很需要一個答案，所以我問了你"要不要跟我在一起"，然後你給我的答案是不知道，你後面也有解釋，其實當時我就覺得我可以接受這個答案，但因為當時就已經想好要做這些東西給你了，但我很怕我做了之後我們分開，所以我才會想要一個答案，但最後我自己還是堅信我們會在一起的，我反覆問了自己好幾次。我知道你現在很忙，有工作有功課，你很難有其他心力去處理感情的事情，我現在也在學會努力不要把整個人的重心都在你身上，我們都有各自的生活，相處的時間少了，但還是可以在一起啊，我們就用少少的時間陪伴，我覺得我也很開心。我其實不知道讓你休息的這些天，你在想什麼，我其實也很害怕，你會不會就說你不想繼續了，但我相信你不會的，我相信你心裡還是有我的，只是你很彆扭都不敢說。
           </p>
         </div>
         <button class="button wide" id="toStep2Btn" type="button">所以，我想問妳... 💌</button>
@@ -2296,8 +2344,11 @@
     <!-- Step 9: 最終黑幕打字機真摯留言 -->
     <section class="step" id="step9" data-step="9" aria-label="最終留言">
       <div class="epilogue-stage" id="epilogueStage">
-        <p class="epilogue-text"><span id="epilogueTyped"></span><span id="epilogueCursor" class="epilogue-cursor">|</span></p>
-        <button class="epilogue-close-btn" id="closeWebpageBtn" type="button">關閉</button>
+        <div class="epilogue-inner">
+          <p class="epilogue-text"><span id="epilogueTyped"></span><span id="epilogueCursor" class="epilogue-cursor">|</span></p>
+          <button class="epilogue-close-btn" id="closeWebpageBtn" type="button">關閉網頁</button>
+          <p class="epilogue-footnote" id="epilogueFootnote">（敢去找其他人你就死定了🔪）</p>
+        </div>
       </div>
     </section>
   </main>
@@ -2377,7 +2428,7 @@
   <div class="modal-backdrop" id="summaryModal" role="dialog" aria-modal="true" aria-labelledby="modalTitle" aria-hidden="true">
     <div class="modal">
       <h2 id="modalTitle">最後確認一下 💌</h2>
-      <p>這份約會計畫準備送出囉。確認後會為妳發射紙飛機，也會寄到信箱。</p>
+      <p>這份約會計畫準備送出囉~</p>
       <div class="modal-summary" id="modalSummary"></div>
       <div class="modal-actions">
         <button class="button modal-cancel" id="modalCancel" type="button">再改一下</button>
@@ -2920,66 +2971,100 @@
     // Step 1 前進按鈕
     $("#toStep2Btn").addEventListener("click", () => showStep(2));
 
-    // 25 組精密計算之按鈕隨機逃跑座標
-    const runawayPositions = [
-      { x: 90,  y: -45 },
-      { x: -90, y: -40 },
-      { x: 85,  y: 45 },
-      { x: -85, y: 45 },
-      { x: 0,   y: -65 },
-      { x: 95,  y: 5 },
-      { x: -95, y: 5 },
-      { x: 0,   y: 65 },
-      { x: 80,  y: -55 },
-      { x: -80, y: -55 },
-      { x: 90,  y: 35 },
-      { x: -90, y: 35 },
-      { x: 25,  y: -65 },
-      { x: -25, y: -65 },
-      { x: 85,  y: -20 },
-      { x: -85, y: -20 },
-      { x: 30,  y: 65 },
-      { x: -30, y: 65 },
-      { x: 80,  y: 50 },
-      { x: -80, y: 50 },
-      { x: 95,  y: -30 },
-      { x: -95, y: -30 },
-      { x: 70,  y: -60 },
-      { x: -70, y: -60 },
-      { x: 75,  y: 60 }
-    ];
+    // 「不要」按鈕隨機逃跑：範圍為「山有木兮木有枝，心悦君兮君不知。」底下到卡片底部，
+    // 四周保留邊框空間，而且絕對不會跟「要」按鈕重疊或碰到
+    const RUNAWAY_EDGE_PADDING = 22;   // 與卡片邊框保留的距離 (px)
+    const RUNAWAY_YES_GAP = 18;        // 與「要」按鈕之間至少保留的距離 (px)
+    const RUNAWAY_MIN_MOVE = 70;       // 每次至少移動的距離，確保看得出在逃跑 (px)
+    let lastRunawayCenter = null;
+
+    function pickRunawayCenter(colW, colH) {
+      const card = elements.yesNoZone.closest(".paper-card");
+      const poem = card ? card.querySelector(".poetic-subheading") : null;
+      const cardRect = card.getBoundingClientRect();
+      const poemBottom = poem ? poem.getBoundingClientRect().bottom : elements.yesNoZone.getBoundingClientRect().top;
+
+      // 可移動的範圍（以「不要」中心點計算）
+      const minX = cardRect.left + RUNAWAY_EDGE_PADDING + colW / 2;
+      const maxX = cardRect.right - RUNAWAY_EDGE_PADDING - colW / 2;
+      const minY = poemBottom + 12 + colH / 2;
+      const maxY = cardRect.bottom - RUNAWAY_EDGE_PADDING - colH / 2;
+
+      // 「要」按鈕放大後的最終範圍（中心點不受 scale 影響）
+      const yesRect = elements.yesButton.getBoundingClientRect();
+      const yesCx = yesRect.left + yesRect.width / 2;
+      const yesCy = yesRect.top + yesRect.height / 2;
+      const yesHalfW = (elements.yesButton.offsetWidth * state.yesScale) / 2 + RUNAWAY_YES_GAP;
+      const yesHalfH = (elements.yesButton.offsetHeight * state.yesScale) / 2 + 8 + RUNAWAY_YES_GAP; // +8 為按鈕底部陰影
+
+      const overlapsYes = (cx, cy) =>
+        Math.abs(cx - yesCx) < yesHalfW + colW / 2 &&
+        Math.abs(cy - yesCy) < yesHalfH + colH / 2;
+
+      let best = null;
+      let bestScore = -Infinity;
+      for (let i = 0; i < 80; i++) {
+        const cx = minX + Math.random() * Math.max(0, maxX - minX);
+        const cy = minY + Math.random() * Math.max(0, maxY - minY);
+        if (overlapsYes(cx, cy)) continue;
+        const moved = lastRunawayCenter ? Math.hypot(cx - lastRunawayCenter.x, cy - lastRunawayCenter.y) : Infinity;
+        if (moved >= RUNAWAY_MIN_MOVE) return { x: cx, y: cy };
+        if (moved > bestScore) { bestScore = moved; best = { x: cx, y: cy }; }
+      }
+      if (best) return best;
+
+      // 保險：空間太擠時，放到離「要」最遠的角落
+      const corners = [
+        { x: minX, y: minY }, { x: maxX, y: minY },
+        { x: minX, y: maxY }, { x: maxX, y: maxY }
+      ];
+      corners.sort((a, b) => Math.hypot(b.x - yesCx, b.y - yesCy) - Math.hypot(a.x - yesCx, a.y - yesCy));
+      return corners[0];
+    }
 
     // Step 2: 每次點「不要」時，「要」按鈕等比變大，「不要」按鈕逃跑縮小並輪播挽回情話
     function runAway() {
       state.noClicks += 1;
 
-      state.yesScale = Math.min(1.85, 1 + state.noClicks * 0.045);
+      // 「要」放大速度加快（每次 +12%，最大 2.4 倍）
+      state.yesScale = Math.min(2.4, 1 + state.noClicks * 0.12);
       elements.yesButton.style.transform = `scale(${state.yesScale})`;
 
-      state.noScale = Math.max(0.55, 1 - state.noClicks * 0.02);
+      state.noScale = Math.max(0.6, 1 - state.noClicks * 0.02);
       const wobble = (state.noClicks % 2 === 0 ? 1 : -1) * 6;
       elements.noButton.style.transform = `scale(${state.noScale}) rotate(${wobble}deg)`;
 
-      if (!elements.noColumn.classList.contains("runaway")) {
-        const zoneRect = elements.yesNoZone.getBoundingClientRect();
-        const colRect = elements.noColumn.getBoundingClientRect();
-        const startX = (colRect.left + colRect.width / 2) - (zoneRect.left + zoneRect.width / 2);
-        const startY = (colRect.top + colRect.height / 2) - (zoneRect.top + zoneRect.height / 2);
-
-        elements.noColumn.classList.add("runaway");
-        elements.noColumn.style.transform = `translate(-50%, -50%) translate(${startX}px, ${startY}px)`;
-        void elements.noColumn.offsetWidth;
-      }
-
-      const target = runawayPositions[(state.noClicks - 1) % runawayPositions.length];
-      elements.noColumn.style.transform = `translate(-50%, -50%) translate(${target.x}px, ${target.y}px)`;
-
+      // 先更新挽回台詞，才能量到「不要」區塊（含台詞）真正的大小
       const lineIndex = (state.noClicks - 1) % CONFIG.PERSUASION_LINES.length;
       elements.persuasion.textContent = CONFIG.PERSUASION_LINES[lineIndex];
       elements.persuasion.classList.add("visible");
 
-      const btnRect = elements.noButton.getBoundingClientRect();
-      throwTinyHearts({ x: btnRect.left + btnRect.width / 2, y: btnRect.top + 10 });
+      if (!elements.noColumn.classList.contains("runaway")) {
+        const zoneRect0 = elements.yesNoZone.getBoundingClientRect();
+        const colRect = elements.noColumn.getBoundingClientRect();
+        const startX = (colRect.left + colRect.width / 2) - (zoneRect0.left + zoneRect0.width / 2);
+        const startY = (colRect.top + colRect.height / 2) - (zoneRect0.top + zoneRect0.height / 2);
+
+        elements.noColumn.classList.add("runaway");
+        elements.noColumn.style.transform = `translate(-50%, -50%) translate(${startX}px, ${startY}px)`;
+        void elements.noColumn.offsetWidth;
+        lastRunawayCenter = {
+          x: zoneRect0.left + zoneRect0.width / 2 + startX,
+          y: zoneRect0.top + zoneRect0.height / 2 + startY
+        };
+      }
+
+      const colW = elements.noColumn.offsetWidth;
+      const colH = elements.noColumn.offsetHeight;
+      const target = pickRunawayCenter(colW, colH);
+      lastRunawayCenter = target;
+
+      const zoneRect = elements.yesNoZone.getBoundingClientRect();
+      const tx = target.x - (zoneRect.left + zoneRect.width / 2);
+      const ty = target.y - (zoneRect.top + zoneRect.height / 2);
+      elements.noColumn.style.transform = `translate(-50%, -50%) translate(${tx}px, ${ty}px)`;
+
+      throwTinyHearts({ x: target.x, y: target.y - colH / 2 + 10 });
     }
 
     elements.noButton.addEventListener("click", runAway);
@@ -3327,7 +3412,7 @@
     let step8ReadyForTap = false;
     let step8TapTimer = null;
     let epilogueTypeTimer = null;
-    const EPILOGUE_MESSAGE = "這些就是在休息的時候做的，兩個網頁一共打了5536行代碼，總共打了50800個字，這個規格的網頁在市場上至少可以賣10萬以上，要弄那些愛心、動畫，那些可不是放影片上去欸，那可是我跟AI不死不休搞了好幾個小時用數學算出來的（還不是你寶貝會一點程式的數學，叫其他人來給他AI都不一定做得出來），唉你才知道你的寶貝有多用心，雖然你寶貝表面很冷淡臉很臭，但內心可是對你有著永不熄滅的愛，所以希望你會喜歡！也希望我們可以好好的在一起，如果喜歡我準備的這些也可大大方方的跟我說! 好啦，關掉這個網頁，去找那個用心對你的人吧~（敢去找其他人你就死定了🔪）";
+    const EPILOGUE_MESSAGE = "這些就是在休息的時候做的，兩個網頁一共打了5536行代碼，總共打了50800個字，這個規格的網頁在市場上至少可以賣10萬以上，要弄那些愛心、動畫，那些可不是放影片上去欸，那可是我跟AI不死不休搞了好幾個小時用數學算出來的（還不是你寶貝會一點程式的數學，叫其他人來給他AI都不一定做得出來），唉你才知道你的寶貝有多用心，雖然你寶貝表面很冷淡臉很臭，但內心可是對你有著永不熄滅的愛，所以希望你會喜歡！也希望我們可以好好的在一起，如果喜歡我準備的這些也可大大方方的跟我說! 好啦，關掉這個網頁，去找那個用心對你的人吧~";
 
     function runTkinterLoveShow() {
       const stage = document.getElementById("popupStage");
@@ -3397,15 +3482,15 @@
       }, heartDrawnTime);
     }
 
-    // 階段四：滿版彈窗風暴（一次跳 5 個在不同位置，約 5 秒全部跳完，速度飛快）
+    // 階段四：滿版彈窗風暴（一次跳 5 個在不同位置，約 7 秒全部跳完，速度飛快）
     function startFullScreenStorm(winW, winH, cardW, cardH, stage) {
       if (!stage) stage = document.getElementById("popupStage");
       if (!stage) return;
 
-      // 總數量 400 個，每次 5 個在不同方位，總共 80 波
-      const totalPopups = 400;
+      // 總數量 560 個，每次 5 個在不同方位，總共 112 波
+      const totalPopups = 560;
       const batchSize = 5; // 一次跳 5 個在不同位置
-      // 5 秒全部跳完：5000ms / 80波 = 62.5ms 一波
+      // 約 7 秒全部跳完：7000ms / 112波 = 62.5ms 一波
       const burstInterval = 62.5;
 
       // 5 個不同區域劃分，確保同一波的 5 張便利貼分布在螢幕不同方位（左上、右上、中央、左下、右下）
@@ -3449,8 +3534,9 @@
         wave++;
       }
 
-      // 滿版視窗全部彈完後，畫面持續停留，並在底部浮現「輕觸螢幕一下」
-      const totalStormDuration = Math.round(wave * burstInterval) + 300;
+      // 滿版視窗全部彈完後，畫面持續停留，隔 1.5 秒才在底部浮現「輕觸螢幕一下」
+      const TAP_HINT_DELAY_AFTER_STORM = 1500;
+      const totalStormDuration = Math.round(wave * burstInterval) + TAP_HINT_DELAY_AFTER_STORM;
       step8TapTimer = window.setTimeout(() => {
         if (state.step !== 8) return;
         step8ReadyForTap = true;
@@ -3469,37 +3555,91 @@
       });
     }
 
-    // Step 9 打字機逐字浮現效果 + 完成後顯示關閉按鈕
+    // 把留言依標點切成一句一句（句子結束在「，。！？~）」之後，或在「（」之前，頓號「、」不拆開）
+    function splitEpilogueClauses(text) {
+      const breakAfter = "，。！!？?~～）);；";
+      const clauses = [];
+      let cur = "";
+      for (const ch of Array.from(text)) {
+        if ((ch === "（" || ch === "(") && cur.trim()) { clauses.push(cur); cur = ""; }
+        cur += ch;
+        if (breakAfter.includes(ch)) { clauses.push(cur); cur = ""; }
+      }
+      if (cur) clauses.push(cur);
+      return clauses.map(c => c.replace(/^\s+/, "")).filter(Boolean);
+    }
+
+    // Step 9 打字機逐字浮現效果 + 完成後顯示「關閉網頁」按鈕
     function startEpilogueTypewriter() {
       const typedEl = document.getElementById("epilogueTyped");
       const cursorEl = document.getElementById("epilogueCursor");
       const closeBtn = document.getElementById("closeWebpageBtn");
+      const footnote = document.getElementById("epilogueFootnote");
       const epilogueStage = document.getElementById("epilogueStage");
       if (!typedEl) return;
 
       window.clearTimeout(epilogueTypeTimer);
-      typedEl.textContent = "";
+      // 游標先移回原位，再清空文字
+      if (cursorEl && typedEl.parentNode) typedEl.parentNode.appendChild(cursorEl);
+      typedEl.innerHTML = "";
       if (cursorEl) cursorEl.classList.remove("done");
       if (closeBtn) closeBtn.classList.remove("visible");
-      if (epilogueStage) epilogueStage.classList.remove("closed-fade");
+      if (footnote) footnote.classList.remove("visible");
+      if (epilogueStage) {
+        epilogueStage.classList.remove("closed-fade");
+        epilogueStage.scrollTop = 0;
+      }
 
-      const chars = Array.from(EPILOGUE_MESSAGE);
+      // 先把整段文字（隱形）排版好：每一句是一個整體，放不下就整句換行，打字時版面不會跳動
+      const charSpans = [];
+      splitEpilogueClauses(EPILOGUE_MESSAGE).forEach((clause, i) => {
+        if (i > 0) typedEl.appendChild(document.createTextNode("\u200B")); // 句與句之間允許換行
+        const clauseEl = document.createElement("span");
+        clauseEl.className = "epilogue-clause";
+        Array.from(clause).forEach(ch => {
+          const s = document.createElement("span");
+          s.className = "epilogue-char";
+          s.textContent = ch;
+          clauseEl.appendChild(s);
+          charSpans.push(s);
+        });
+        typedEl.appendChild(clauseEl);
+      });
+      if (cursorEl && charSpans[0]) charSpans[0].before(cursorEl);
+
+      // 文字超出螢幕時，自動往下捲動跟上打字進度
+      const keepInView = el => {
+        if (!epilogueStage) return;
+        const r = el.getBoundingClientRect();
+        const s = epilogueStage.getBoundingClientRect();
+        const limit = s.bottom - 60;
+        if (r.bottom > limit) epilogueStage.scrollTop += r.bottom - limit;
+      };
+
       let idx = 0;
-
       const typeNextChar = () => {
         if (state.step !== 9) return;
-        if (idx < chars.length) {
-          const ch = chars[idx];
-          typedEl.textContent += ch;
+        if (idx < charSpans.length) {
+          const span = charSpans[idx];
+          span.classList.add("shown");
+          if (cursorEl) span.after(cursorEl);
+          keepInView(span);
           idx++;
-          const isPausePunct = ch === "，" || ch === "!" || ch === "！" || ch === "~" || ch === "～";
-          const nextDelay = isPausePunct ? 380 : 95;
+          const ch = span.textContent;
+          const isPausePunct = "，。！!？?~～）".includes(ch);
+          const nextDelay = isPausePunct ? 300 : 75;
           epilogueTypeTimer = window.setTimeout(typeNextChar, nextDelay);
         } else {
-          // 全部文字打完，游標淡出、底下浮現「關閉」按鈕
+          // 全部文字打完，游標淡出、底下浮現「關閉網頁」按鈕與小附註
           epilogueTypeTimer = window.setTimeout(() => {
             if (cursorEl) cursorEl.classList.add("done");
             if (closeBtn) closeBtn.classList.add("visible");
+            if (footnote) footnote.classList.add("visible");
+            if (epilogueStage) {
+              window.setTimeout(() => {
+                epilogueStage.scrollTo({ top: epilogueStage.scrollHeight, behavior: "smooth" });
+              }, 80);
+            }
           }, 350);
         }
       };
