@@ -703,18 +703,190 @@
 
     /* Step 7: 最後你想跟我說什麼 (密語輸入關卡) */
     #step7 .paper-card {
+      position: relative;
       background: linear-gradient(168deg, rgba(255, 252, 254, 0.96) 0%, rgba(248, 245, 255, 0.94) 50%, rgba(255, 248, 243, 0.96) 100%);
       border-color: rgba(230, 215, 242, 0.9);
       box-shadow: 0 18px 46px rgba(135, 105, 150, 0.12), 0 3px 10px rgba(135, 105, 150, 0.08);
+      transform-origin: center 60%;
+      will-change: transform, opacity;
     }
     #step7 .paper-card::after {
       border-color: rgba(200, 160, 220, 0.25);
+    }
+    /* 確保標題、輸入框、提示文字與按鈕永遠在最上層，不被任何裂痕遮擋 */
+    #step7 #secretTitle,
+    #step7 .secret-box {
+      position: relative;
+      z-index: 6;
     }
     .secret-box {
       margin: 24px 0 16px;
     }
     .secret-wrap {
       margin-bottom: 14px;
+    }
+
+    /* ════════════════════════════════════════════════════════════════
+       ⚡ Step 7 地震裂痕與坍塌黑幕系統（裂痕隨錯誤加深變大 · 不擋文字）
+       ════════════════════════════════════════════════════════════════ */
+    .step7-card-cracks {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 1;
+      overflow: hidden;
+      border-radius: inherit;
+    }
+    .step7-screen-cracks {
+      position: fixed;
+      inset: 0;
+      width: 100vw;
+      height: 100dvh;
+      pointer-events: none;
+      z-index: 15;
+      overflow: hidden;
+      display: none;
+    }
+    body[data-step="7"] .step7-screen-cracks {
+      display: block;
+    }
+    .crack-group {
+      opacity: 0;
+      transition: opacity 0.15s ease;
+    }
+    .crack-group.active {
+      opacity: 1;
+    }
+    .crack-group path {
+      fill: none;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      vector-effect: non-scaling-stroke;
+    }
+    .crack-group .crack-glow {
+      stroke: rgba(70, 35, 48, 0.18);
+      stroke-width: calc(4.5px * var(--group-scale, 1));
+      transition: stroke-width 0.22s ease, stroke 0.22s ease;
+    }
+    .crack-group .crack-main {
+      stroke: #2b1820;
+      stroke-width: calc(1.35px * var(--group-scale, 1));
+      filter: drop-shadow(0 1px 1px rgba(255, 255, 255, 0.45));
+      transition: stroke-width 0.22s ease;
+    }
+    .crack-group .crack-branch {
+      stroke: rgba(52, 28, 38, 0.78);
+      stroke-width: calc(0.85px * var(--group-scale, 1));
+      transition: stroke-width 0.22s ease;
+    }
+
+    /* 地震搖晃時的邊緣震波暗角 */
+    .quake-vignette {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 16;
+      opacity: 0;
+      background: radial-gradient(circle at 50% 42%, transparent 52%, rgba(45, 20, 30, 0.38) 100%);
+      transition: opacity 0.25s ease;
+    }
+    .quake-vignette.active {
+      opacity: 1;
+    }
+
+    /* 地震掉落的碎屑微粒 */
+    .quake-debris {
+      position: fixed;
+      top: -12px;
+      width: var(--d-size, 6px);
+      height: var(--d-size, 6px);
+      background: #4a2e38;
+      clip-path: polygon(18% 0%, 92% 14%, 100% 82%, 35% 100%, 0% 62%);
+      pointer-events: none;
+      z-index: 20;
+      opacity: 0.85;
+      animation: debrisFall var(--d-dur, 1.1s) cubic-bezier(0.32, 0, 0.85, 0.65) forwards;
+    }
+    @keyframes debrisFall {
+      0% {
+        transform: translate3d(0, 0, 0) rotate(0deg);
+        opacity: 0.92;
+      }
+      100% {
+        transform: translate3d(var(--d-drift, 18px), 104vh, 0) rotate(var(--d-rot, 280deg));
+        opacity: 0;
+      }
+    }
+
+    /* 錯誤達上限時的卡片崩解下墜動畫 */
+    #step7 .paper-card.collapsing {
+      pointer-events: none;
+      animation: cardCollapseFall 0.88s cubic-bezier(0.55, 0.05, 0.85, 0.28) forwards !important;
+    }
+    @keyframes cardCollapseFall {
+      0% {
+        transform: translate3d(0, 0, 0) rotate(0deg) scale(1);
+        opacity: 1;
+      }
+      22% {
+        transform: translate3d(-14px, 12px, 0) rotate(-3.5deg) scale(0.98);
+        opacity: 0.96;
+      }
+      45% {
+        transform: translate3d(16px, 38px, 0) rotate(5.5deg) scale(0.94);
+        opacity: 0.85;
+      }
+      100% {
+        transform: translate3d(-24px, 115vh, 0) rotate(14deg) scale(0.82);
+        opacity: 0;
+      }
+    }
+
+    /* 坍塌後的全黑畫面與「重新再來」按鈕 */
+    .step7-collapse-overlay {
+      position: fixed;
+      inset: 0;
+      width: 100vw;
+      height: 100dvh;
+      background: #000000;
+      z-index: 99999;
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 28px;
+      text-align: center;
+      opacity: 0;
+      transition: opacity 0.55s ease;
+    }
+    .step7-collapse-overlay.show {
+      display: flex;
+      opacity: 1;
+    }
+    .collapse-retry-btn {
+      appearance: none;
+      background: rgba(255, 255, 255, 0.12);
+      color: #ffffff;
+      border: 1.5px solid rgba(255, 195, 215, 0.65);
+      border-radius: 999px;
+      padding: 14px 42px;
+      font-size: 16.5px;
+      font-weight: 700;
+      letter-spacing: 0.2em;
+      text-indent: 0.2em;
+      cursor: pointer;
+      box-shadow: 0 0 26px rgba(255, 130, 175, 0.38), 0 8px 24px rgba(0, 0, 0, 0.8);
+      transition: transform 0.2s ease, background 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+      animation: epilogueBtnIn 0.65s ease-out 0.25s both;
+    }
+    .collapse-retry-btn:hover,
+    .collapse-retry-btn:active {
+      background: rgba(255, 255, 255, 0.24);
+      border-color: rgba(255, 215, 230, 0.92);
+      transform: scale(1.05);
+      box-shadow: 0 0 34px rgba(255, 145, 185, 0.65), 0 8px 26px rgba(0, 0, 0, 0.85);
     }
 
     /* ════════════════════════════════════════════════════════════════
@@ -2080,7 +2252,7 @@
         <h1 id="chapter1Title">第二章</h1>
         <div class="letter-stage">
           <p>
-            我一開始真的很需要一個答案，所以我問了你"要不要跟我在一起"，然後你給我的答案是不知道，你後面也有解釋，其實當時我就覺得我可以接受這個答案，但因為當時就已經想好要做這些東西給你了，但我很怕我做了之後我們分開，所以我才會想要一個答案，但最後我自己還是堅信我們會在一起的，這個問題我反覆問了自己好幾次。我知道你現在很忙，有工作有功課，很難有其他心力去處理感情的事情，所以我也想要讓你覺得，跟我相處是一件輕鬆的事情，我現在也在學會努力不要把整個人的重心都在你身上，我們都有各自的生活，相處的時間少了，但還是可以在一起啊，我們就用少少的時間陪伴，我覺得我也很開心。我其實不知道讓你休息的這些天，你在想什麼，我其實也很害怕，你會不會就說你不想繼續了，但我相信你不會的，我相信妳心裡還是有留一個位置給我的~
+            我一開始真的很需要一個答案，所以我問了你"要不要跟我在一起"，然後你給我的答案是不知道，你後面也有解釋，其實當時我就覺得我可以接受這個答案，但因為當時就已經想好要做這些東西給你了，但我很怕我做了之後我們分開，所以我才會想要一個答案，但最後我自己還是堅信我們會在一起的，這個問題我反覆問了自己好幾次。我知道你現在很忙，有工作有功課，很難有其他心力去處理感情的事情，所以我也想要讓你覺得，跟我相處是一件輕鬆的事情，我現在也在學會努力不要把整個人的重心都在你身上，我們都有各自的生活，相處的時間少了，但還是可以在一起啊，我們就用少少的時間陪伴，我覺得我也很開心。我其實不知道讓你休息的這些天，你在想什麼，我其實也很害怕，你會不會就說你不想繼續了，但我相信你不會的，我相信你心裡還是有我的，只是你很彆扭都不敢說。
           </p>
         </div>
         <button class="button wide" id="toStep2Btn" type="button">所以，我想問妳... 💌</button>
@@ -2304,13 +2476,16 @@
 
     <!-- Step 7: 最後你想跟我說什麼 (密語互動關卡) -->
     <section class="step" id="step7" data-step="7" aria-labelledby="secretTitle">
-      <div class="paper-card">
+      <div class="paper-card" id="step7Card">
+        <!-- 卡片裂痕層（附帶文字安全區遮罩，絕對不擋到任何文字與輸入框） -->
+        <svg id="step7CardCracks" class="step7-card-cracks" viewBox="0 0 600 700" preserveAspectRatio="none" aria-hidden="true"></svg>
+
         <h1 id="secretTitle">最後你想跟我說什麼</h1>
-        <div class="secret-box">
+        <div class="secret-box" id="secretBox">
           <div class="input-wrap secret-wrap" id="secretWrap">
             <input type="text" id="secretInput" placeholder="請輸入想對我說的話…" autocomplete="off" />
           </div>
-          <p class="message" id="secretMsg" role="alert">你喜歡誰?</p>
+          <p class="message" id="secretMsg" role="alert">說說你最喜歡誰~</p>
           <button class="button wide" id="secretSubmitBtn" type="button">確認送出 💌</button>
         </div>
       </div>
@@ -2321,7 +2496,6 @@
       <div class="paper-card final-page">
         <!-- 愛心正中央：「我也喜歡你」核心文字 (完全不被愛心擋到) -->
         <div class="center-hero" id="centerHero">
-          <div class="center-hero-heart">💖</div>
           <h1 class="grand-love-title center-hero-text" id="finalTitle">我也喜歡你</h1>
         </div>
 
@@ -2437,6 +2611,13 @@
     </div>
   </div>
 
+  <!-- Step 7 螢幕四周邊緣延伸裂痕層與坍塌全黑畫面（置於 body 層確保真正全螢幕且不壓文字） -->
+  <svg id="step7ScreenCracks" class="step7-screen-cracks" viewBox="0 0 1000 1000" preserveAspectRatio="none" aria-hidden="true"></svg>
+  <div id="quakeVignette" class="quake-vignette" aria-hidden="true"></div>
+  <div id="step7CollapseOverlay" class="step7-collapse-overlay" role="dialog" aria-modal="true" aria-label="畫面已坍塌">
+    <button id="step7RetryBtn" class="collapse-retry-btn" type="button">重新再來</button>
+  </div>
+
 
 
   <script>
@@ -2480,7 +2661,7 @@
         "妳確定嗎？🥺",
         "再想一下嘛……",
         "寶貝跟我和好嘛～好不好？",
-        "這一個月沒有妳，真的很不習慣。",
+        "休息的這段期間沒有妳，真的很不習慣。",
         "我真的很想妳 😭",
         "別躲了～快點投降啦！",
         "按鈕都已經大成這樣了，只能選『要』了啦！😤",
@@ -3277,19 +3458,318 @@
       }, 4550);
     });
 
-    // Step 7: 最後你想跟我說什麼 (輸入包含「喜歡你」或「喜歡妳」或「我喜歡你」即可通過)
+    // ════════════════════════════════════════════════════════════════
+    // ⚡ Step 7: 最後你想跟我說什麼（語意防否定檢查 + 漸進地震裂痕 + 坍塌重來）
+    // ════════════════════════════════════════════════════════════════
+    const MAX_SECRET_ERRORS = 14; // 連續答錯 14 次（10~20次區間）觸發畫面徹底坍塌
+    let secretErrorCount = 0;
+    let isStep7Collapsing = false;
+
+    // 卡片下半部與邊緣 14 道漸進式裂痕路徑（完全避開上半部文字與輸入框區域，並搭配動態 SVG 遮罩雙重保護文字）
+    const CARD_CRACK_PATHS = [
+      // Level 1: 右下角初現裂紋
+      { main: "M 600 640 L 548 612 L 512 618 L 476 592 L 445 598", branch: "M 548 612 L 530 652 M 512 618 L 495 648" },
+      // Level 2: 左下角龜裂
+      { main: "M 0 625 L 54 596 L 96 604 L 138 576 L 172 584", branch: "M 54 596 L 72 640 M 96 604 L 118 638" },
+      // Level 3: 右下邊緣向內延伸裂紋
+      { main: "M 600 508 L 552 492 L 514 504 L 478 486", branch: "M 552 492 L 536 462 M 514 504 L 496 534" },
+      // Level 4: 左下邊緣向內延伸裂紋
+      { main: "M 0 512 L 48 494 L 88 506 L 126 488", branch: "M 48 494 L 66 464 M 88 506 L 106 536" },
+      // Level 5: 底部中央偏右向上裂開
+      { main: "M 390 700 L 372 642 L 394 596 L 368 548 L 382 508", branch: "M 372 642 L 418 620 L 442 632 M 394 596 L 344 576" },
+      // Level 6: 底部中央偏左向上裂開
+      { main: "M 210 700 L 228 638 L 204 590 L 234 542 L 218 498", branch: "M 228 638 L 182 614 L 156 626 M 204 590 L 254 568" },
+      // Level 7: 右側中下段向內深裂
+      { main: "M 600 458 L 542 444 L 494 464 L 442 442 L 398 460 L 358 446", branch: "M 542 444 L 518 414 M 494 464 L 468 504 L 438 514" },
+      // Level 8: 左側中下段向內深裂
+      { main: "M 0 464 L 58 448 L 108 468 L 162 444 L 208 462 L 248 446", branch: "M 58 448 L 82 416 M 108 468 L 134 508 L 164 518" },
+      // Level 9: 右下往中央下方貫穿大裂縫
+      { main: "M 600 562 L 520 536 L 456 558 L 388 528 L 318 550 L 266 532", branch: "M 520 536 L 492 498 M 388 528 L 362 488 M 318 550 L 296 590" },
+      // Level 10: 左下往中央下方貫穿大裂縫
+      { main: "M 0 554 L 82 532 L 148 550 L 216 522 L 286 544 L 338 524", branch: "M 82 532 L 112 494 M 216 522 L 244 484 M 286 544 L 308 586" },
+      // Level 11: 底部橫向蛛網碎裂
+      { main: "M 78 700 L 118 654 L 168 666 L 228 638 L 302 658 L 372 642 L 448 664 L 516 636 L 558 700", branch: "M 302 658 L 300 700 M 168 666 L 148 700 M 448 664 L 468 700" },
+      // Level 12: 下半部中心蛛網連通
+      { main: "M 248 446 L 298 470 L 358 446 M 298 470 L 304 536 L 272 596 L 312 656", branch: "M 298 470 L 264 426 M 298 470 L 336 424 M 272 596 L 228 592" },
+      // Level 13: 下半部兩側邊框縱向撕裂
+      { main: "M 0 382 L 28 404 L 14 438 L 58 448 M 600 378 L 572 400 L 586 434 L 542 444", branch: "M 28 404 L 64 392 M 572 400 L 536 388" },
+      // Level 14: 臨界崩解全網大裂縫
+      { main: "M 0 412 L 76 426 L 154 406 L 236 428 L 302 412 L 374 430 L 448 408 L 526 424 L 600 404", branch: "M 154 406 L 182 446 M 448 408 L 418 448 M 302 412 L 300 468" }
+    ];
+
+    // 螢幕四周邊緣 14 道延伸裂痕（在卡片外圍與螢幕四角蔓延）
+    const SCREEN_CRACK_PATHS = [
+      { main: "M 0 0 L 68 54 L 52 112 L 108 158", branch: "M 68 54 L 124 38" },
+      { main: "M 1000 0 L 928 58 L 946 118 L 888 164", branch: "M 928 58 L 872 42" },
+      { main: "M 0 1000 L 78 932 L 142 948 L 196 892", branch: "M 78 932 L 54 868" },
+      { main: "M 1000 1000 L 918 928 L 854 946 L 798 888", branch: "M 918 928 L 944 862" },
+      { main: "M 0 480 L 64 462 L 118 492 L 168 468", branch: "M 64 462 L 92 418" },
+      { main: "M 1000 510 L 934 488 L 882 518 L 832 494", branch: "M 934 488 L 906 442" },
+      { main: "M 320 0 L 342 56 L 312 104", branch: "M 342 56 L 388 74" },
+      { main: "M 680 0 L 658 58 L 688 108", branch: "M 658 58 L 612 76" },
+      { main: "M 280 1000 L 308 926 L 278 864 L 324 812", branch: "M 308 926 L 364 904" },
+      { main: "M 720 1000 L 692 924 L 722 862 L 676 808", branch: "M 692 924 L 636 902" },
+      { main: "M 0 240 L 74 268 L 132 244 L 184 282", branch: "M 74 268 L 52 324" },
+      { main: "M 1000 250 L 924 276 L 866 252 L 814 290", branch: "M 924 276 L 948 332" },
+      { main: "M 0 740 L 82 712 L 146 738 L 204 698", branch: "M 82 712 L 112 662" },
+      { main: "M 1000 750 L 916 718 L 852 744 L 794 704", branch: "M 916 718 L 886 668" }
+    ];
+
+    function initStep7CracksDOM() {
+      const cardSvg = document.getElementById("step7CardCracks");
+      const screenSvg = document.getElementById("step7ScreenCracks");
+      if (cardSvg && !cardSvg.dataset.initialized) {
+        cardSvg.dataset.initialized = "true";
+        const groupsHtml = CARD_CRACK_PATHS.map((item, idx) => {
+          const level = idx + 1;
+          return `<g class="crack-group" data-level="${level}">
+            <path class="crack-glow" d="${item.main}" />
+            <path class="crack-main" d="${item.main}" />
+            ${item.branch ? `<path class="crack-branch" d="${item.branch}" />` : ""}
+          </g>`;
+        }).join("");
+        cardSvg.innerHTML = `
+          <defs>
+            <mask id="step7SafeTextMask" maskUnits="userSpaceOnUse" x="0" y="0" width="600" height="700">
+              <rect x="0" y="0" width="600" height="700" fill="white" />
+              <rect id="step7MaskCutout" x="0" y="0" width="600" height="350" fill="black" />
+            </mask>
+          </defs>
+          <g mask="url(#step7SafeTextMask)">${groupsHtml}</g>
+        `;
+      }
+      if (screenSvg && !screenSvg.dataset.initialized) {
+        screenSvg.dataset.initialized = "true";
+        const screenGroupsHtml = SCREEN_CRACK_PATHS.map((item, idx) => {
+          const level = idx + 1;
+          return `<g class="crack-group" data-level="${level}">
+            <path class="crack-glow" d="${item.main}" />
+            <path class="crack-main" d="${item.main}" />
+            ${item.branch ? `<path class="crack-branch" d="${item.branch}" />` : ""}
+          </g>`;
+        }).join("");
+        screenSvg.innerHTML = `
+          <defs>
+            <mask id="step7ScreenSafeMask" maskUnits="userSpaceOnUse" x="0" y="0" width="1000" height="1000">
+              <rect x="0" y="0" width="1000" height="1000" fill="white" />
+              <rect id="step7ScreenMaskCutout" x="150" y="50" width="700" height="460" rx="24" fill="black" />
+            </mask>
+          </defs>
+          <g mask="url(#step7ScreenSafeMask)">${screenGroupsHtml}</g>
+        `;
+      }
+    }
+
+    // 動態計算標題、輸入框、錯誤提示與按鈕的範圍，更新雙層 SVG 遮罩確保裂痕 100% 絕不壓到任何文字
+    function updateStep7TextSafeMask() {
+      const card = document.getElementById("step7Card");
+      const title = document.getElementById("secretTitle");
+      const box = document.getElementById("secretBox");
+      const cutout = document.getElementById("step7MaskCutout");
+      const screenCutout = document.getElementById("step7ScreenMaskCutout");
+      if (!card || !title || !box) return;
+
+      const cardRect = card.getBoundingClientRect();
+      if (cardRect.width <= 0 || cardRect.height <= 0) return;
+
+      const titleRect = title.getBoundingClientRect();
+      const boxRect = box.getBoundingClientRect();
+
+      if (cutout) {
+        const bottomPx = Math.max(titleRect.bottom, boxRect.bottom) - cardRect.top + 20;
+        const scaleY = 700 / cardRect.height;
+        const safeH = Math.min(540, Math.max(260, Math.round(bottomPx * scaleY)));
+        cutout.setAttribute("x", "0");
+        cutout.setAttribute("y", "0");
+        cutout.setAttribute("width", "600");
+        cutout.setAttribute("height", String(safeH));
+      }
+
+      if (screenCutout) {
+        const vw = Math.max(1, window.innerWidth);
+        const vh = Math.max(1, window.innerHeight);
+        const sx = 1000 / vw;
+        const sy = 1000 / vh;
+        const leftV = Math.min(titleRect.left, boxRect.left) - 18;
+        const topV = Math.min(titleRect.top, boxRect.top) - 18;
+        const rightV = Math.max(titleRect.right, boxRect.right) + 18;
+        const bottomV = Math.max(titleRect.bottom, boxRect.bottom) + 18;
+        screenCutout.setAttribute("x", String(Math.max(0, Math.round(leftV * sx))));
+        screenCutout.setAttribute("y", String(Math.max(0, Math.round(topV * sy))));
+        screenCutout.setAttribute("width", String(Math.max(100, Math.round((rightV - leftV) * sx))));
+        screenCutout.setAttribute("height", String(Math.max(80, Math.round((bottomV - topV) * sy))));
+      }
+    }
+
+    // 根據累積錯誤次數更新裂痕數量與裂縫寬度（每錯一次，舊裂縫變粗、新裂縫竄出）
+    function renderStep7Cracks(errorLevel) {
+      initStep7CracksDOM();
+      updateStep7TextSafeMask();
+
+      const allGroups = document.querySelectorAll("#step7CardCracks .crack-group, #step7ScreenCracks .crack-group");
+      allGroups.forEach(group => {
+        const lv = Number(group.dataset.level || 0);
+        if (lv <= errorLevel) {
+          group.classList.add("active");
+          // 越早出現的裂痕隨錯誤次數增加而越裂越寬
+          const age = errorLevel - lv;
+          const scale = (1 + age * 0.22 + errorLevel * 0.08).toFixed(2);
+          group.style.setProperty("--group-scale", scale);
+        } else {
+          group.classList.remove("active");
+          group.style.setProperty("--group-scale", "1");
+        }
+      });
+    }
+
+    // 掉落地震碎屑微粒（避開中央文字區，從畫面兩側與上方邊緣掉落）
+    function spawnQuakeDebris(intensityLevel) {
+      const count = Math.min(26, 4 + intensityLevel * 2);
+      for (let i = 0; i < count; i++) {
+        const shard = document.createElement("span");
+        shard.className = "quake-debris";
+        // 分佈在左右兩側或頂部邊緣，視覺震撼且不干擾閱讀
+        const onLeft = Math.random() < 0.5;
+        const xPct = onLeft ? (2 + Math.random() * 24) : (74 + Math.random() * 24);
+        const size = (4 + Math.random() * (3 + intensityLevel * 0.45)).toFixed(1);
+        const dur = (0.75 + Math.random() * 0.65).toFixed(2);
+        const drift = ((Math.random() - 0.5) * 60).toFixed(0);
+        const rot = ((Math.random() < 0.5 ? -1 : 1) * (180 + Math.random() * 240)).toFixed(0);
+
+        shard.style.left = `${xPct}vw`;
+        shard.style.setProperty("--d-size", `${size}px`);
+        shard.style.setProperty("--d-dur", `${dur}s`);
+        shard.style.setProperty("--d-drift", `${drift}px`);
+        shard.style.setProperty("--d-rot", `${rot}deg`);
+        document.body.appendChild(shard);
+        window.setTimeout(() => shard.remove(), Number(dur) * 1000 + 80);
+      }
+    }
+
+    // 觸發地震搖晃效果（隨錯誤次數越震越劇烈）
+    function triggerSecretEarthquake(intensityLevel) {
+      const card = document.getElementById("step7Card");
+      const vignette = document.getElementById("quakeVignette");
+      const amp = Math.min(24, 3.5 + intensityLevel * 1.45); // 震幅隨錯誤次數遞增 (px)
+      const rotAmp = Math.min(2.6, 0.35 + intensityLevel * 0.16); // 旋轉角度遞增 (deg)
+      const duration = Math.min(880, 380 + intensityLevel * 36);
+
+      if (vignette) {
+        vignette.classList.add("active");
+        window.setTimeout(() => vignette.classList.remove("active"), duration);
+      }
+
+      spawnQuakeDebris(intensityLevel);
+
+      if (card && typeof card.animate === "function") {
+        const frames = [
+          { transform: "translate3d(0, 0, 0) rotate(0deg)" },
+          { transform: `translate3d(${-amp}px, ${amp * 0.6}px, 0) rotate(${-rotAmp}deg)` },
+          { transform: `translate3d(${amp * 0.9}px, ${-amp * 0.7}px, 0) rotate(${rotAmp * 0.85}deg)` },
+          { transform: `translate3d(${-amp * 0.85}px, ${-amp * 0.4}px, 0) rotate(${-rotAmp * 0.7}deg)` },
+          { transform: `translate3d(${amp * 0.75}px, ${amp * 0.65}px, 0) rotate(${rotAmp * 0.65}deg)` },
+          { transform: `translate3d(${-amp * 0.6}px, ${amp * 0.3}px, 0) rotate(${-rotAmp * 0.5}deg)` },
+          { transform: `translate3d(${amp * 0.45}px, ${-amp * 0.4}px, 0) rotate(${rotAmp * 0.35}deg)` },
+          { transform: `translate3d(${-amp * 0.25}px, ${amp * 0.2}px, 0) rotate(${-rotAmp * 0.2}deg)` },
+          { transform: "translate3d(0, 0, 0) rotate(0deg)" }
+        ];
+        card.animate(frames, { duration, easing: "cubic-bezier(0.36, 0.07, 0.19, 0.97)" });
+      } else if (elements.secretWrap) {
+        elements.secretWrap.classList.add("shake");
+        window.setTimeout(() => elements.secretWrap.classList.remove("shake"), 400);
+      }
+    }
+
+    // 觸發第 14 次錯誤的「畫面徹底坍塌 ➔ 全黑畫面 ➔ 重新再來」
+    function triggerStep7Collapse() {
+      isStep7Collapsing = true;
+      renderStep7Cracks(MAX_SECRET_ERRORS);
+      triggerSecretEarthquake(MAX_SECRET_ERRORS + 2);
+
+      const card = document.getElementById("step7Card");
+      const overlay = document.getElementById("step7CollapseOverlay");
+
+      window.setTimeout(() => {
+        if (card) card.classList.add("collapsing");
+        spawnQuakeDebris(MAX_SECRET_ERRORS + 4);
+      }, 320);
+
+      window.setTimeout(() => {
+        if (overlay) overlay.classList.add("show");
+      }, 980);
+    }
+
+    // 點擊「重新再來」復原畫面並繼續留在 Step 7 輸入
+    function resetStep7Collapse() {
+      secretErrorCount = 0;
+      isStep7Collapsing = false;
+      const card = document.getElementById("step7Card");
+      const overlay = document.getElementById("step7CollapseOverlay");
+      if (overlay) overlay.classList.remove("show");
+      if (card) card.classList.remove("collapsing");
+      renderStep7Cracks(0);
+      hideMessage(elements.secretMsg);
+      if (elements.secretInput) {
+        elements.secretInput.value = "";
+        elements.secretInput.focus();
+      }
+    }
+
+    const step7RetryBtn = document.getElementById("step7RetryBtn");
+    if (step7RetryBtn) {
+      step7RetryBtn.addEventListener("click", resetStep7Collapse);
+    }
+
+    // 語意檢測：必須真心表達「喜歡你/妳」，排除「不喜歡你」、「有點不太喜歡你」、「沒喜歡你」等否定或疑問語氣
+    function checkSecretConfession(raw) {
+      const cleaned = (raw || "").replace(/\s+/g, "");
+      if (!cleaned) return { ok: false, reason: "empty" };
+
+      // 將真正的雙重否定（例如「不能不喜歡你」、「不得不喜歡你」、「不是不喜歡你」）先還原為肯定「喜歡」
+      const normalized = cleaned.replace(/(?:不是不|並不是不|不能不|不得不|不會不|沒辦法不|無法不)喜歡/g, "喜歡");
+
+      if (!/喜歡[你妳]/.test(normalized)) {
+        return { ok: false, reason: "missing" };
+      }
+
+      // 依標點拆成子句，檢查每個「喜歡你/妳」前後是否有否定詞（「不」、「不太」、「沒有」、「不怎麼」等）
+      const clauses = normalized.split(/[，。！？!?,.;；~～、]+/).filter(Boolean);
+      const negBeforeRegex = /(?:不|沒|無|別|莫|休想|才不|才沒|誰|哪有|哪裡|怎麼可能|怎可能|不可能|絕不|絕對不|不再|不想|不曾|並沒|並非|算不上|談不上|說不上|不知道|不確定|不覺得|不認為|懷疑)[太很怎麼那麼那樣這麼這樣特別真真的再會想有過點一點一點點兒個什麼多大多麼敢能要願願意可能夠曾曾經是算自己還喜]{0,6}喜歡[你妳]/;
+      const negAfterRegex = /喜歡[你妳](?:才怪|個頭|個鬼|是假的|是騙|騙你的|騙妳的|嗎|呢|\?|？)/;
+      const uncertainRegex = /喜不喜歡[你妳]/;
+
+      let positiveCount = 0;
+      let lastIsPositive = false;
+
+      for (const clause of clauses) {
+        if (!/喜歡[你妳]/.test(clause)) continue;
+        if (uncertainRegex.test(clause) || negBeforeRegex.test(clause) || negAfterRegex.test(clause)) {
+          lastIsPositive = false;
+        } else {
+          positiveCount++;
+          lastIsPositive = true;
+        }
+      }
+
+      if (positiveCount === 0 || !lastIsPositive) {
+        return { ok: false, reason: "negated" };
+      }
+
+      return { ok: true, reason: "pass" };
+    }
+
     function handleSecretPass() {
+      if (isStep7Collapsing) return;
       const input = elements.secretInput;
       const msg = elements.secretMsg;
       const raw = (input.value || "").trim();
-      const cleaned = raw.replace(/\s+/g, "");
+      const check = checkSecretConfession(raw);
 
-      // 檢查是否包含「喜歡你」或「喜歡妳」（例如：「我覺得過完這幾天 我應該還是有喜歡你」）
-      const hasLove = /喜歡[你妳]/.test(cleaned);
-
-      if (hasLove) {
+      if (check.ok) {
         hideMessage(msg);
         state.secretMessage = raw;
+        secretErrorCount = 0;
+        renderStep7Cracks(0);
 
         // 背景非同步發送包含她真心話的完整約會計畫至 Webhook（完全隱密發送至 Gmail，畫面不顯示任何已寄出提示）
         sendPlan("final_plan_with_secret");
@@ -3297,8 +3777,21 @@
         // 通過！跳轉至 Step 8 終極大結局，並啟動 Tkinter 彈窗愛心與滿版風暴
         showStep(8);
       } else {
-        // 未提到喜歡你：跳出提示「你喜歡誰?」與震動反饋
-        showMessage(msg, "你喜歡誰?");
+        secretErrorCount += 1;
+
+        const errText = secretErrorCount === 1
+          ? "說說你最喜歡誰~"
+          : "不可以說不喜歡我啦！再給妳一次機會好好說 😤";
+        showMessage(msg, errText);
+
+        if (secretErrorCount >= MAX_SECRET_ERRORS) {
+          triggerStep7Collapse();
+          return;
+        }
+
+        renderStep7Cracks(secretErrorCount);
+        triggerSecretEarthquake(secretErrorCount);
+
         if (elements.secretWrap) {
           elements.secretWrap.classList.add("shake");
           window.setTimeout(() => elements.secretWrap.classList.remove("shake"), 400);
