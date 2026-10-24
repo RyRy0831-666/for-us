@@ -3905,7 +3905,12 @@
     let step8ReadyForTap = false;
     let step8TapTimer = null;
     let epilogueTypeTimer = null;
-    const EPILOGUE_MESSAGE = "這些就是在休息的時候做的，兩個網頁一共打了5536行代碼，總共打了50800個字，這個規格的網頁在市場上至少可以賣10萬以上，要弄那些愛心、動畫，那些可不是放影片上去欸，那可是我跟AI不死不休搞了好幾個小時用數學算出來的（還不是你寶貝會一點程式的數學，叫其他人來給他AI都不一定做得出來），唉你才知道你的寶貝有多用心，雖然你寶貝表面很冷淡臉很臭，但內心可是對你有著永不熄滅的愛，所以希望你會喜歡！也希望我們可以好好的在一起，如果喜歡我準備的這些也可大大方方的跟我說! 好啦，關掉這個網頁，去找那個用心對你的人吧~";
+    const EPILOGUE_MESSAGE = [
+      "這些就是在休息的時候做的，兩個網頁一共打了5536行代碼，總共打了50800個字，這個規格的網頁在市場上至少可以賣10萬以上，要弄那些愛心、動畫，那些可不是放影片上去欸，那可是我跟AI不死不休搞了好幾個小時用數學算出來的（還不是你寶貝會一點程式的數學，叫其他人來給他AI都不一定做得出來），唉你才知道你的寶貝有多用心，雖然你寶貝表面很冷淡有時候臉很臭，但內心可是對你有著永不熄滅的愛，所以希望你會喜歡！也希望我們可以好好的在一起，如果喜歡我準備的這些也可大大方方的跟我說!",
+      "和好這種事應該就不用宣布了，我們就繼續好好相處，慢慢回暖!!!",
+      "記得不要再敷衍我了，最近看你都很敷衍，但我想說還沒有確定和好就先這樣沒關係，唉我那熾熱的心都要被你熄滅了~~~",
+      "好啦，關掉這個網頁，去找那個用心對你的人吧~"
+    ].join("\n");
 
     function runTkinterLoveShow() {
       const stage = document.getElementById("popupStage");
@@ -4048,15 +4053,18 @@
       });
     }
 
-    // 把留言依標點切成一句一句（句子結束在「，。！？~）」之後，或在「（」之前，頓號「、」不拆開）
+    // 把留言依標點切成一句一句（句子結束在「，。！？~）」之後，或在「（」之前，頓號「、」與連續標點「!!! / ~~~」不拆開）
     function splitEpilogueClauses(text) {
       const breakAfter = "，。！!？?~～）);；";
+      const chars = Array.from(text);
       const clauses = [];
       let cur = "";
-      for (const ch of Array.from(text)) {
+      for (let i = 0; i < chars.length; i++) {
+        const ch = chars[i];
+        const nextCh = chars[i + 1] || "";
         if ((ch === "（" || ch === "(") && cur.trim()) { clauses.push(cur); cur = ""; }
         cur += ch;
-        if (breakAfter.includes(ch)) { clauses.push(cur); cur = ""; }
+        if (breakAfter.includes(ch) && !breakAfter.includes(nextCh)) { clauses.push(cur); cur = ""; }
       }
       if (cur) clauses.push(cur);
       return clauses.map(c => c.replace(/^\s+/, "")).filter(Boolean);
@@ -4083,20 +4091,26 @@
         epilogueStage.scrollTop = 0;
       }
 
-      // 先把整段文字（隱形）排版好：每一句是一個整體，放不下就整句換行，打字時版面不會跳動
+      // 先把整段文字（隱形）依換行與子句排版好：每一句是一個整體，放不下就整句換行，\n 則強制換行
       const charSpans = [];
-      splitEpilogueClauses(EPILOGUE_MESSAGE).forEach((clause, i) => {
-        if (i > 0) typedEl.appendChild(document.createTextNode("\u200B")); // 句與句之間允許換行
-        const clauseEl = document.createElement("span");
-        clauseEl.className = "epilogue-clause";
-        Array.from(clause).forEach(ch => {
-          const s = document.createElement("span");
-          s.className = "epilogue-char";
-          s.textContent = ch;
-          clauseEl.appendChild(s);
-          charSpans.push(s);
+      const lines = EPILOGUE_MESSAGE.split("\n");
+      lines.forEach((line, lineIdx) => {
+        if (lineIdx > 0) {
+          typedEl.appendChild(document.createElement("br"));
+        }
+        splitEpilogueClauses(line).forEach((clause, i) => {
+          if (i > 0) typedEl.appendChild(document.createTextNode("\u200B")); // 句與句之間允許換行
+          const clauseEl = document.createElement("span");
+          clauseEl.className = "epilogue-clause";
+          Array.from(clause).forEach(ch => {
+            const s = document.createElement("span");
+            s.className = "epilogue-char";
+            s.textContent = ch;
+            clauseEl.appendChild(s);
+            charSpans.push(s);
+          });
+          typedEl.appendChild(clauseEl);
         });
-        typedEl.appendChild(clauseEl);
       });
       if (cursorEl && charSpans[0]) charSpans[0].before(cursorEl);
 
@@ -4119,7 +4133,8 @@
           keepInView(span);
           idx++;
           const ch = span.textContent;
-          const isPausePunct = "，。！!？?~～）".includes(ch);
+          const nextCh = charSpans[idx] ? charSpans[idx].textContent : "";
+          const isPausePunct = "，。！!？?~～）".includes(ch) && !"，。！!？?~～）".includes(nextCh);
           const nextDelay = isPausePunct ? 300 : 75;
           epilogueTypeTimer = window.setTimeout(typeNextChar, nextDelay);
         } else {
